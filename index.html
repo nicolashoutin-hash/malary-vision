@@ -29,6 +29,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .logo-badge{width:28px;height:28px;border-radius:6px;background:var(--or);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#07080a;}
 .page-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;}
 .fb-badge{font-size:10px;padding:3px 9px;border-radius:99px;font-family:'DM Mono',monospace;background:var(--or-bg);color:var(--or);border:1px solid var(--or-border);}
+.product-switch{display:flex;gap:4px;}
+.product-tab{font-size:11px;padding:4px 11px;border-radius:99px;font-family:'DM Sans',sans-serif;font-weight:500;text-decoration:none;color:var(--text3);border:1px solid var(--border2);transition:all .15s;}
+.product-tab:hover{color:var(--text2);border-color:var(--text3);}
+.product-tab.active{color:#07080a;background:var(--or);border-color:var(--or);}
 .topbar-right{display:flex;align-items:center;gap:8px;}
 .topbar-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
 .topbar-btn:hover{border-color:var(--or);color:var(--or);}
@@ -124,8 +128,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-logo-badge">FA</div>
-      <div><div class="login-title">FlowAlert</div><div class="login-sub">Dashboard Vision · Malary</div></div>
+      <div class="login-logo-badge" id="login-badge">FA</div>
+      <div><div class="login-title" id="login-title">FlowAlert</div><div class="login-sub">Dashboard Vision · Malary</div></div>
     </div>
     <div class="login-field">
       <label class="login-label">Email</label>
@@ -142,8 +146,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 <div id="app" style="display:none;flex-direction:column;height:100%;">
   <div class="topbar">
     <div class="topbar-left">
-      <div class="logo-badge">FA</div>
-      <div class="page-title">FlowAlert — Dashboard Vision</div>
+      <div class="logo-badge" id="topbar-badge">FA</div>
+      <div class="page-title" id="page-title">FlowAlert — Dashboard Vision</div>
+      <div class="product-switch" id="product-switch"></div>
       <div class="fb-badge" id="fb-status">Connexion…</div>
     </div>
     <div class="topbar-right">
@@ -288,7 +293,9 @@ import{getFirestore,collection,onSnapshot,updateDoc,doc,setDoc,getDoc,serverTime
 import{getAuth,signInWithEmailAndPassword,signOut}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import{initializeApp as initApp2}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getAuth as getAuth2,createUserWithEmailAndPassword as createUser2}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-const firebaseConfig={
+// ── Identité admin Malary : toujours le même projet Firebase (flowalert-82de1),
+// quel que soit l'onglet Flow actif — c'est le compte interne dashboardmanager@malary.eu.
+const AUTH_CONFIG={
   apiKey:"AIzaSyBjcAEGYHbhddyrg5bEgnXUq_mWSwe27cw",
   authDomain:"flowalert-82de1.firebaseapp.com",
   projectId:"flowalert-82de1",
@@ -296,11 +303,46 @@ const firebaseConfig={
   messagingSenderId:"983126758574",
   appId:"1:983126758574:web:bf2c8ebbf83f5a9e48493f"
 };
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
-const auth=getAuth(app);
-const appSecondary=initApp2(firebaseConfig,'vision-secondary');
+
+// ── Un onglet par Flow. Chaque produit a son propre projet Firebase (clients/licences
+// vivent dans le même projet Firebase que l'app mobile du produit). Pour ajouter un
+// nouveau Flow (FlowSite, FlowSafe...) une fois son projet Firebase créé : ajouter une
+// entrée ici avec sa config web (Firebase Console → Paramètres du projet → Application Web).
+const PRODUCTS={
+  flowalert:{key:'flowalert',badge:'FA',name:'FlowAlert',licPrefix:'FLWA',firebaseConfig:AUTH_CONFIG},
+  flowcity:{key:'flowcity',badge:'FC',name:'FlowCity',licPrefix:'FLWC',firebaseConfig:{
+    apiKey:"AIzaSyCx9SMFhCp-w-VGK38SqEqhSGpQ4Rt53R8",
+    authDomain:"flow-city-mmqh3t.firebaseapp.com",
+    projectId:"flow-city-mmqh3t",
+    storageBucket:"flow-city-mmqh3t.firebasestorage.app",
+    messagingSenderId:"318622427671",
+    appId:"1:318622427671:web:f38bdeb12b5276a6478a52"
+  }}
+};
+const urlParamsBoot=new URLSearchParams(window.location.search);
+const CURRENT_PRODUCT=PRODUCTS[urlParamsBoot.get('product')]||PRODUCTS.flowalert;
+
+// Connexion admin (auth) : toujours sur AUTH_CONFIG. Données (db) + création des comptes
+// clients (authSecondary) : sur le projet Firebase du produit actif.
+const authApp=initializeApp(AUTH_CONFIG,'vision-auth');
+const auth=getAuth(authApp);
+const dataApp=initializeApp(CURRENT_PRODUCT.firebaseConfig,'vision-data');
+const db=getFirestore(dataApp);
+const appSecondary=initApp2(CURRENT_PRODUCT.firebaseConfig,'vision-secondary');
 const authSecondary=getAuth2(appSecondary);
+
+function applyBranding(){
+  document.title=CURRENT_PRODUCT.name+' — Dashboard Vision';
+  document.getElementById('login-badge').textContent=CURRENT_PRODUCT.badge;
+  document.getElementById('login-title').textContent=CURRENT_PRODUCT.name;
+  document.getElementById('topbar-badge').textContent=CURRENT_PRODUCT.badge;
+  document.getElementById('page-title').textContent=CURRENT_PRODUCT.name+' — Dashboard Vision';
+  document.getElementById('product-switch').innerHTML=Object.values(PRODUCTS).map(p=>
+    '<a class="product-tab'+(p.key===CURRENT_PRODUCT.key?' active':'')+'" href="?product='+p.key+'">'+p.name+'</a>'
+  ).join('');
+}
+applyBranding();
+
 const TIER_PRIX={'Starter':149,'Pro':249,'Enterprise':0};
 const TIER_DEFAULT_LICS={'Starter':5,'Pro':15,'Enterprise':30};
 let allClients=[],unsubClients=null;
@@ -458,14 +500,14 @@ window.enterClientDashboard=function(){
   if(!currentClientId) return;
   const c=allClients.find(x=>x.id===currentClientId);
   document.getElementById('intervention-label').textContent=(c?.nom||currentClientId)+' ('+currentClientId+')';
-  document.getElementById('intervention-iframe').src='https://dashboardmanager.malary.eu/index.html?client_id='+encodeURIComponent(currentClientId);
+  document.getElementById('intervention-iframe').src='https://dashboardmanager.malary.eu/index.html?client_id='+encodeURIComponent(currentClientId)+'&product='+CURRENT_PRODUCT.key;
   showView('intervention');
 };
 // ── Création client ──────────────────────────────────────────────────────────
 function genererCodeLicence(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const seg=()=>Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
-  return 'FLWA-'+seg()+'-'+seg()+'-'+seg();
+  return CURRENT_PRODUCT.licPrefix+'-'+seg()+'-'+seg()+'-'+seg();
 }
 function slugify(nom){
   return(nom||'')
