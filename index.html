@@ -10,7 +10,6 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;font-size:15px;}
-
 .login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;}
 .login-box{background:var(--bg2);border:1px solid var(--or-border);border-radius:16px;padding:40px;width:380px;display:flex;flex-direction:column;gap:20px;}
 .login-logo{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
@@ -25,7 +24,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .login-btn:hover{background:var(--or2);}
 .login-btn:disabled{opacity:.5;cursor:not-allowed;}
 .login-error{font-size:11px;color:var(--red);text-align:center;background:var(--red-bg);border:1px solid rgba(248,113,113,.2);border-radius:6px;padding:8px;display:none;}
-
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;}
 .topbar-left{display:flex;align-items:center;gap:12px;}
 .logo-badge{width:28px;height:28px;border-radius:6px;background:var(--or);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#07080a;}
@@ -37,16 +35,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .topbar-btn.logout{border-color:rgba(248,113,113,.3);color:var(--red);}
 .topbar-btn.logout:hover{background:var(--red-bg);}
 .clock{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);}
-
 .app-body{display:flex;flex:1;min-height:0;overflow:hidden;}
-
 .view{flex:1;overflow-y:auto;padding:20px;display:none;flex-direction:column;gap:16px;}
 .view.active{display:flex;}
-
 .view-header{display:flex;align-items:center;justify-content:space-between;}
 .view-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;}
 .view-sub{font-size:12px;color:var(--text3);margin-top:2px;}
-
 .btn{padding:8px 18px;border-radius:7px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .15s;border:1px solid transparent;}
 .btn-or{background:var(--or);color:#07080a;border-color:var(--or);}
 .btn-or:hover{background:var(--or2);}
@@ -56,7 +50,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .btn-red:hover{background:var(--red);color:#fff;}
 .btn-amber{background:var(--amber-bg);color:var(--amber);border-color:rgba(251,191,36,.3);}
 .btn-amber:hover{background:var(--amber);color:#07080a;}
-
 /* ── KPIs globaux ── */
 .global-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 .kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;position:relative;overflow:hidden;}
@@ -64,7 +57,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .kpi-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;font-family:'DM Mono',monospace;}
 .kpi-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;letter-spacing:-0.5px;line-height:1;}
 .kpi-sub{font-size:11px;margin-top:4px;color:var(--text3);}
-
 .clients-list{display:flex;flex-direction:column;gap:8px;}
 .client-row-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .15s;}
 .client-row-item:hover{border-color:var(--or-border);}
@@ -76,17 +68,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .client-statut-pill.suspendu{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.3);}
 .client-mrr{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;}
 .client-row-item .arrow{color:var(--text3);font-size:18px;}
-
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;color:var(--text3);font-size:11px;gap:8px;text-align:center;}
 .empty-state .ico{font-size:32px;opacity:.3;}
-
 .detail-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
 .metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;position:relative;overflow:hidden;}
 .metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent,var(--or)),transparent);opacity:.6;}
 .metric-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-family:'DM Mono',monospace;}
 .metric-value{font-family:'Syne',sans-serif;font-size:32px;font-weight:700;letter-spacing:-0.5px;line-height:1;}
 .metric-sub{font-size:12px;margin-top:6px;color:var(--text3);}
-
 .detail-card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;overflow:hidden;}
 .detail-card-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);}
 .detail-card-title{font-size:14px;font-weight:600;font-family:'Syne',sans-serif;}
@@ -98,7 +87,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .lic-pill.active{background:var(--green-bg);color:var(--green);}
 .lic-pill.disponible{background:var(--blue-bg);color:var(--blue);}
 .lic-pill.revoquee{background:var(--red-bg);color:var(--red);}
-
 .modal-overlay{position:fixed;inset:0;background:rgba(7,8,10,.85);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-overlay.active{display:flex;}
 .modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;}
@@ -116,28 +104,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .form-select{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:10px 14px;font-size:13px;color:var(--text);outline:none;font-family:'DM Sans',sans-serif;cursor:pointer;}
 .form-select:focus{border-color:var(--or);}
 .form-hint{font-size:10px;color:var(--text3);margin-top:-4px;}
-
 .result-box{background:var(--bg3);border:1px solid var(--or-border);border-radius:9px;padding:14px;margin-top:12px;}
 .result-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:var(--or);margin-bottom:10px;}
 .lic-codes{display:flex;flex-direction:column;gap:4px;max-height:240px;overflow-y:auto;}
 .lic-code{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);background:var(--bg4);border:1px solid var(--border);border-radius:5px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;}
 .lic-code .copy-btn{font-size:10px;color:var(--or);cursor:pointer;border:none;background:none;}
-
 .intervention-bar{display:flex;align-items:center;gap:10px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--or-border);flex-shrink:0;}
 .intervention-badge{display:flex;align-items:center;gap:6px;font-size:11px;padding:4px 10px;border-radius:99px;background:var(--or-bg);color:var(--or);border:1px solid var(--or-border);font-family:'DM Mono',monospace;}
 .intervention-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--or);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 .intervention-iframe{flex:1;width:100%;border:none;background:var(--bg);}
-
 .toast{position:fixed;bottom:20px;right:20px;background:var(--bg4);border:1px solid var(--or-border);border-radius:7px;padding:9px 14px;font-size:11px;color:var(--text);z-index:1000;display:none;}
-
 /* ── Licences supplémentaires (modal ajout) ── */
 .add-lic-btn{font-size:11px;padding:5px 12px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
 .add-lic-btn:hover{border-color:var(--or);color:var(--or);}
 </style>
 </head>
 <body>
-
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-logo">
@@ -156,7 +139,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
     <button class="login-btn" id="login-btn" onclick="doLogin()">Se connecter</button>
   </div>
 </div>
-
 <div id="app" style="display:none;flex-direction:column;height:100%;">
   <div class="topbar">
     <div class="topbar-left">
@@ -171,9 +153,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       <button class="topbar-btn logout" onclick="doLogout()">Déconnexion</button>
     </div>
   </div>
-
   <div class="app-body">
-
     <!-- VUE LISTE -->
     <div class="view active" id="view-list">
       <div class="view-header">
@@ -191,7 +171,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       </div>
       <div class="clients-list" id="clients-list"></div>
     </div>
-
     <!-- VUE FICHE CLIENT -->
     <div class="view" id="view-detail">
       <div class="view-header">
@@ -204,13 +183,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
           <button class="btn btn-or" onclick="enterClientDashboard()">→ Entrer dans le dashboard</button>
         </div>
       </div>
-
       <div class="detail-metrics">
         <div class="metric-card" style="--accent:var(--green)"><div class="metric-label">Licences actives</div><div class="metric-value" id="d-lic-active">—</div><div class="metric-sub" id="d-lic-active-sub">—</div></div>
         <div class="metric-card" style="--accent:var(--blue)"><div class="metric-label">Licences en attente</div><div class="metric-value" id="d-lic-pending">—</div><div class="metric-sub">disponibles, non attribuées</div></div>
         <div class="metric-card" style="--accent:var(--amber)"><div class="metric-label">CA de ce client</div><div class="metric-value" id="d-ca">—</div><div class="metric-sub" id="d-ca-sub">€ / mois</div></div>
       </div>
-
       <div class="detail-card">
         <div class="detail-card-header">
           <div class="detail-card-title">Licences (<span id="d-lic-total">0</span>)</div>
@@ -222,7 +199,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
         </table>
       </div>
     </div>
-
     <!-- VUE INTERVENTION IFRAME -->
     <div class="view" id="view-intervention" style="padding:0;flex-direction:column;">
       <div class="intervention-bar">
@@ -231,10 +207,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       </div>
       <iframe class="intervention-iframe" id="intervention-iframe" src="about:blank"></iframe>
     </div>
-
   </div>
 </div>
-
 <!-- MODAL NOUVEAU CLIENT -->
 <div class="modal-overlay" id="create-modal">
   <div class="modal-box">
@@ -285,7 +259,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
     </div>
   </div>
 </div>
-
 <!-- MODAL AJOUT LICENCES -->
 <div class="modal-overlay" id="add-lic-modal">
   <div class="modal-box">
@@ -308,16 +281,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getFirestore,collection,onSnapshot,updateDoc,doc,setDoc,getDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import{getAuth,signInWithEmailAndPassword,signOut}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import{initializeApp as initApp2}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getAuth as getAuth2,createUserWithEmailAndPassword as createUser2}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-
 const firebaseConfig={
   apiKey:"AIzaSyBjcAEGYHbhddyrg5bEgnXUq_mWSwe27cw",
   authDomain:"flowalert-82de1.firebaseapp.com",
@@ -326,20 +296,16 @@ const firebaseConfig={
   messagingSenderId:"983126758574",
   appId:"1:983126758574:web:bf2c8ebbf83f5a9e48493f"
 };
-
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const auth=getAuth(app);
 const appSecondary=initApp2(firebaseConfig,'vision-secondary');
 const authSecondary=getAuth2(appSecondary);
-
 const TIER_PRIX={'Starter':149,'Pro':249,'Enterprise':0};
 const TIER_DEFAULT_LICS={'Starter':5,'Pro':15,'Enterprise':30};
-
 let allClients=[],unsubClients=null;
 let allLicences=[],unsubLicences=null;
 let currentClientId=null;
-
 // ── Auth ────────────────────────────────────────────────────────────────────
 window.doLogin=async function(){
   const email=document.getElementById('login-email').value.trim();
@@ -358,7 +324,6 @@ window.doLogin=async function(){
   }
   btn.disabled=false;btn.textContent='Se connecter';
 };
-
 window.doLogout=async function(){
   if(unsubClients) unsubClients();
   if(unsubLicences) unsubLicences();
@@ -367,17 +332,14 @@ window.doLogout=async function(){
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('login-password').value='';
 };
-
 // ── Clock ───────────────────────────────────────────────────────────────────
 setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleTimeString('fr-FR'),1000);
-
 // ── Toast ───────────────────────────────────────────────────────────────────
 function toast(msg,color='var(--or)'){
   const t=document.getElementById('toast');
   t.textContent=msg;t.style.borderColor=color;t.style.display='block';
   setTimeout(()=>t.style.display='none',3500);
 }
-
 // ── Listeners ───────────────────────────────────────────────────────────────
 function startListeners(){
   unsubClients=onSnapshot(collection(db,'clients'),snap=>{
@@ -391,7 +353,6 @@ function startListeners(){
     if(currentClientId) renderDetail();
   });
 }
-
 // ── Navigation ──────────────────────────────────────────────────────────────
 window.showView=function(view){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
@@ -410,7 +371,6 @@ window.showView=function(view){
     document.getElementById('back-to-detail-btn').style.display='inline-block';
   }
 };
-
 // ── Render liste ─────────────────────────────────────────────────────────────
 function renderList(){
   const actifs=allClients.filter(c=>c.statut==='actif'||!c.statut);
@@ -418,7 +378,6 @@ function renderList(){
   const arr=mrr*12;
   const licsTotal=allLicences.length;
   const licsActives=allLicences.filter(l=>l.statut==='active').length;
-
   document.getElementById('list-sub').textContent=actifs.length+' client(s) actif(s) sur '+allClients.length;
   document.getElementById('kpi-clients').textContent=actifs.length;
   document.getElementById('kpi-clients-sub').textContent=allClients.length+' au total';
@@ -426,7 +385,6 @@ function renderList(){
   document.getElementById('kpi-lics').textContent=licsTotal;
   document.getElementById('kpi-lics-sub').textContent=licsActives+' actives';
   document.getElementById('kpi-arr').textContent=arr+'€';
-
   const grid=document.getElementById('clients-list');
   if(allClients.length===0){
     grid.innerHTML='<div class="empty-state"><div class="ico">🏢</div><div>Aucun client pour le moment</div><div style="font-size:10px;">Clique sur "+ Nouveau client" pour créer le premier compte.</div></div>';
@@ -445,22 +403,18 @@ function renderList(){
     </div>`;
   }).join('');
 }
-
 // ── Fiche client ─────────────────────────────────────────────────────────────
 window.openClientDetail=function(clientId){
   currentClientId=clientId;
   renderDetail();
   showView('detail');
 };
-
 function renderDetail(){
   const c=allClients.find(x=>x.id===currentClientId);
   if(!c){showView('list');return;}
-
   document.getElementById('detail-nom').textContent=c.nom||c.id;
   const sig=c.date_signature?new Date(c.date_signature).toLocaleDateString('fr-FR'):'—';
   document.getElementById('detail-sub').textContent=(c.tier||'—')+' · '+(c.login_email||'—')+' · signé le '+sig;
-
   const statutBtn=document.getElementById('detail-statut-btn');
   if(c.statut==='actif'||!c.statut){
     statutBtn.textContent='⏸ Suspendre';
@@ -469,21 +423,17 @@ function renderDetail(){
     statutBtn.textContent='▶ Réactiver';
     statutBtn.className='btn btn-green';
   }
-
   const clientLics=allLicences.filter(l=>l.client_id===currentClientId);
   const actives=clientLics.filter(l=>l.statut==='active');
   const pending=clientLics.filter(l=>l.statut==='disponible');
   const total=c.licences_total||clientLics.length||0;
-
   document.getElementById('d-lic-active').textContent=actives.length;
   document.getElementById('d-lic-active-sub').textContent='sur '+total+' au total';
   document.getElementById('d-lic-pending').textContent=pending.length;
   document.getElementById('d-lic-total').textContent=clientLics.length;
-
   const ca=TIER_PRIX[c.tier]||0;
   document.getElementById('d-ca').textContent=ca>0?(ca+'€'):'—';
   document.getElementById('d-ca-sub').textContent=c.tier?('Tier '+c.tier):'—';
-
   const sevOrder={active:0,disponible:1,revoquee:2};
   const sorted=[...clientLics].sort((a,b)=>(sevOrder[a.statut]??9)-(sevOrder[b.statut]??9));
   document.getElementById('d-lic-table-body').innerHTML=sorted.length===0
@@ -494,7 +444,6 @@ function renderDetail(){
       return`<tr><td>${l.id}</td><td><span class="lic-pill ${pillClass}">${pillLabel}</span></td><td>${l.assigned_to||'—'}</td></tr>`;
     }).join('');
 }
-
 window.toggleStatutClient=async function(){
   if(!currentClientId) return;
   const c=allClients.find(x=>x.id===currentClientId);
@@ -505,22 +454,19 @@ window.toggleStatutClient=async function(){
     toast('Statut mis à jour → '+nouveauStatut,'var(--green)');
   }catch(e){toast('Erreur : '+e.message,'var(--red)');}
 };
-
 window.enterClientDashboard=function(){
   if(!currentClientId) return;
   const c=allClients.find(x=>x.id===currentClientId);
   document.getElementById('intervention-label').textContent=(c?.nom||currentClientId)+' ('+currentClientId+')';
-  document.getElementById('intervention-iframe').src='https://dashboard.malary.eu/index.html?client_id='+encodeURIComponent(currentClientId);
+  document.getElementById('intervention-iframe').src='https://dashboardmanager.malary.eu/index.html?client_id='+encodeURIComponent(currentClientId);
   showView('intervention');
 };
-
 // ── Création client ──────────────────────────────────────────────────────────
 function genererCodeLicence(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const seg=()=>Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
   return 'FLWA-'+seg()+'-'+seg()+'-'+seg();
 }
-
 function slugify(nom){
   return(nom||'')
     .toLowerCase()
@@ -528,12 +474,10 @@ function slugify(nom){
     .replace(/[^a-z0-9]+/g,'-')
     .replace(/(^-|-$)/g,'')||'client';
 }
-
 window.prefillLicences=function(){
   const tier=document.getElementById('cli-tier').value;
   document.getElementById('cli-licences').value=TIER_DEFAULT_LICS[tier]||5;
 };
-
 window.openCreateModal=function(){
   document.getElementById('create-result').innerHTML='';
   ['cli-nom','cli-email','cli-password'].forEach(id=>document.getElementById(id).value='');
@@ -542,21 +486,17 @@ window.openCreateModal=function(){
   document.getElementById('create-modal').classList.add('active');
 };
 window.closeCreateModal=function(){document.getElementById('create-modal').classList.remove('active');};
-
 window.createClient=async function(){
   const nom=document.getElementById('cli-nom').value.trim();
   const tier=document.getElementById('cli-tier').value;
   const licencesTotal=parseInt(document.getElementById('cli-licences').value,10);
   const email=document.getElementById('cli-email').value.trim();
   const password=document.getElementById('cli-password').value.trim();
-
   if(!nom||!email||!password){toast('Nom, email et mot de passe requis','var(--red)');return;}
   if(password.length<8){toast('Mot de passe : 8 caractères minimum','var(--red)');return;}
   if(!licencesTotal||licencesTotal<1){toast('Nombre de licences invalide','var(--red)');return;}
-
   const btn=document.getElementById('create-client-btn');
   btn.disabled=true;btn.textContent='Création en cours…';
-
   try{
     let clientId=slugify(nom);
     let suffix=0;
@@ -566,18 +506,14 @@ window.createClient=async function(){
       if(!existing.exists()){clientId=candidate;break;}
       suffix++;
     }
-
     const cred=await createUser2(authSecondary,email,password);
     await authSecondary.signOut();
-
     await setDoc(doc(db,'clients',clientId),{
       nom,tier,licences_total:licencesTotal,statut:'actif',
       date_signature:new Date().toISOString(),
       login_email:email,admin_uid:cred.user.uid
     });
-
     const codes=await genererEtSauvegarderLicences(clientId,licencesTotal);
-
     toast('Client "'+nom+'" créé avec '+licencesTotal+' licence(s)','var(--green)');
     document.getElementById('create-result').innerHTML=buildLicencesResultHTML('Client créé — '+clientId,email,password,codes);
     btn.textContent='+ Créer le client et générer les licences';
@@ -587,7 +523,6 @@ window.createClient=async function(){
     btn.disabled=false;btn.textContent='+ Créer le client et générer les licences';
   }
 };
-
 // ── Ajout de licences ────────────────────────────────────────────────────────
 window.openAddLicModal=function(){
   document.getElementById('add-lic-result').innerHTML='';
@@ -595,7 +530,6 @@ window.openAddLicModal=function(){
   document.getElementById('add-lic-modal').classList.add('active');
 };
 window.closeAddLicModal=function(){document.getElementById('add-lic-modal').classList.remove('active');};
-
 window.addLicences=async function(){
   if(!currentClientId) return;
   const count=parseInt(document.getElementById('add-lic-count').value,10);
@@ -612,7 +546,6 @@ window.addLicences=async function(){
   }catch(e){toast('Erreur : '+e.message,'var(--red)');}
   btn.disabled=false;btn.textContent='+ Générer les licences';
 };
-
 async function genererEtSauvegarderLicences(clientId,count){
   const codes=[];
   for(let i=0;i<count;i++){
@@ -630,7 +563,6 @@ async function genererEtSauvegarderLicences(clientId,count){
   }
   return codes;
 }
-
 function buildLicencesResultHTML(titre,email,password,codes){
   return '<div class="result-box">'+
     '<div class="result-title">✓ '+titre+'</div>'+
