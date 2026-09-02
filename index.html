@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlowAlert — Dashboard Vision</title>
+<title>Dashboard Vision</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#07080a;--bg2:#0d0f12;--bg3:#141619;--bg4:#1c1f24;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);--text:#e8eaf0;--text2:#8892a4;--text3:#454d5c;--or:#C9A84C;--or2:#E8C97A;--or-bg:rgba(201,168,76,0.08);--or-border:rgba(201,168,76,0.2);--green:#34d399;--green-bg:rgba(52,211,153,0.08);--red:#f87171;--red-bg:rgba(248,113,113,0.08);--blue:#60a5fa;--blue-bg:rgba(96,165,250,0.08);--amber:#fbbf24;--amber-bg:rgba(251,191,36,0.08);}
@@ -128,8 +128,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-logo-badge" id="login-badge">FA</div>
-      <div><div class="login-title" id="login-title">FlowAlert</div><div class="login-sub">Dashboard Vision · Malary</div></div>
+      <div class="login-logo-badge" id="login-badge">DV</div>
+      <div><div class="login-title" id="login-title">Dashboard Vision</div><div class="login-sub">Malary</div></div>
     </div>
     <div class="login-field">
       <label class="login-label">Email</label>
@@ -146,8 +146,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 <div id="app" style="display:none;flex-direction:column;height:100%;">
   <div class="topbar">
     <div class="topbar-left">
-      <div class="logo-badge" id="topbar-badge">FA</div>
-      <div class="page-title" id="page-title">FlowAlert — Dashboard Vision</div>
+      <div class="logo-badge" id="topbar-badge">DV</div>
+      <div class="page-title" id="page-title">Dashboard Vision</div>
       <div class="product-switch" id="product-switch"></div>
       <div class="fb-badge" id="fb-status">Connexion…</div>
     </div>
@@ -332,11 +332,6 @@ const appSecondary=initApp2(CURRENT_PRODUCT.firebaseConfig,'vision-secondary');
 const authSecondary=getAuth2(appSecondary);
 
 function applyBranding(){
-  document.title=CURRENT_PRODUCT.name+' — Dashboard Vision';
-  document.getElementById('login-badge').textContent=CURRENT_PRODUCT.badge;
-  document.getElementById('login-title').textContent=CURRENT_PRODUCT.name;
-  document.getElementById('topbar-badge').textContent=CURRENT_PRODUCT.badge;
-  document.getElementById('page-title').textContent=CURRENT_PRODUCT.name+' — Dashboard Vision';
   document.getElementById('product-switch').innerHTML=Object.values(PRODUCTS).map(p=>
     '<a class="product-tab'+(p.key===CURRENT_PRODUCT.key?' active':'')+'" href="?product='+p.key+'">'+p.name+'</a>'
   ).join('');
