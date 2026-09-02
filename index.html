@@ -309,7 +309,18 @@ const AUTH_CONFIG={
 // nouveau Flow (FlowSite, FlowSafe...) une fois son projet Firebase créé : ajouter une
 // entrée ici avec sa config web (Firebase Console → Paramètres du projet → Application Web).
 const PRODUCTS={
-  flowalert:{key:'flowalert',badge:'FA',name:'FlowAlert',licPrefix:'FLWA',firebaseConfig:AUTH_CONFIG},
+  // ⚠️ NE PAS réutiliser AUTH_CONFIG ici : depuis le 2/09 AUTH_CONFIG pointe sur le projet
+  // malary-identite (auth uniquement, pas de Firestore actif) — il faut la config propre du
+  // projet flowalert-82de1, sinon toute lecture/écriture "clients"/"licences" échoue avec
+  // "Failed to get document because the client is offline" (Firestore inexistant sur ce projet).
+  flowalert:{key:'flowalert',badge:'FA',name:'FlowAlert',licPrefix:'FLWA',firebaseConfig:{
+    apiKey:"AIzaSyBjcAEGYHbhddyrg5bEgnXUq_mWSwe27cw",
+    authDomain:"flowalert-82de1.firebaseapp.com",
+    projectId:"flowalert-82de1",
+    storageBucket:"flowalert-82de1.firebasestorage.app",
+    messagingSenderId:"983126758574",
+    appId:"1:983126758574:web:bf2c8ebbf83f5a9e48493f"
+  }},
   flowcity:{key:'flowcity',badge:'FC',name:'FlowCity',licPrefix:'FLWC',firebaseConfig:{
     apiKey:"AIzaSyCx9SMFhCp-w-VGK38SqEqhSGpQ4Rt53R8",
     authDomain:"flow-city-mmqh3t.firebaseapp.com",
