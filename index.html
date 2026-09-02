@@ -633,9 +633,14 @@ async function genererEtSauvegarderLicences(clientId,count){
   return codes;
 }
 function buildLicencesResultHTML(titre,email,password,codes){
+  // Lien du Dashboard Manager du client, avec le paramètre ?product= du Flow concerné toujours
+  // explicite (même pour FlowAlert, par défaut) — pour ne jamais envoyer par erreur un client
+  // sur le mauvais Flow (auquel cas la connexion échoue, le compte n'existant que sur ce Flow).
+  const dashUrl='https://dashboardmanager.malary.eu/?product='+CURRENT_PRODUCT.key;
   return '<div class="result-box">'+
     '<div class="result-title">✓ '+titre+'</div>'+
-    (email?'<div style="font-size:11px;color:var(--text2);margin-bottom:8px;">Identifiants : <b>'+email+'</b> / <span style="font-family:DM Mono,monospace">'+password+'</span></div>':'') +
+    (email?'<div style="font-size:11px;color:var(--text2);margin-bottom:8px;">Identifiants : <b>'+email+'</b> / <span style="font-family:DM Mono,monospace">'+password+'</span></div>'+
+    '<div class="lic-code" style="margin-bottom:12px;"><span style="font-family:DM Mono,monospace;font-size:11px;">'+dashUrl+'</span><button class="copy-btn" onclick="navigator.clipboard.writeText(&quot;'+dashUrl+'&quot;).then(()=>this.textContent=\'✓\')">Copier</button></div>':'') +
     '<div class="result-title">Codes de licence ('+codes.length+')</div>'+
     '<div class="lic-codes">'+codes.map(c=>'<div class="lic-code"><span>'+c+'</span><button class="copy-btn" onclick="navigator.clipboard.writeText(&quot;'+c+'&quot;).then(()=>this.textContent=\'✓\')">Copier</button></div>').join('')+
     '</div></div>';
