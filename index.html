@@ -133,7 +133,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
     </div>
     <div class="login-field">
       <label class="login-label">Email</label>
-      <input class="login-input" id="login-email" type="email" value="dashboardmanager@malary.eu" placeholder="Email">
+      <input class="login-input" id="login-email" type="email" value="dashboard@malary.eu" placeholder="Email">
     </div>
     <div class="login-field">
       <label class="login-label">Mot de passe</label>
@@ -293,15 +293,15 @@ import{getFirestore,collection,onSnapshot,updateDoc,doc,setDoc,getDoc,serverTime
 import{getAuth,signInWithEmailAndPassword,signOut}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import{initializeApp as initApp2}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getAuth as getAuth2,createUserWithEmailAndPassword as createUser2}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-// ── Identité admin Malary : toujours le même projet Firebase (flowalert-82de1),
-// quel que soit l'onglet Flow actif — c'est le compte interne dashboardmanager@malary.eu.
+// ── Identité admin Malary : projet Firebase dédié (malary-identite), indépendant
+// des projets des Flows — compte interne dashboard@malary.eu.
 const AUTH_CONFIG={
-  apiKey:"AIzaSyBjcAEGYHbhddyrg5bEgnXUq_mWSwe27cw",
-  authDomain:"flowalert-82de1.firebaseapp.com",
-  projectId:"flowalert-82de1",
-  storageBucket:"flowalert-82de1.firebasestorage.app",
-  messagingSenderId:"983126758574",
-  appId:"1:983126758574:web:bf2c8ebbf83f5a9e48493f"
+  apiKey:"AIzaSyCYba_gBYv2mT-BzyjZ-oxbgCNhNfIDav8",
+  authDomain:"malary-identite.firebaseapp.com",
+  projectId:"malary-identite",
+  storageBucket:"malary-identite.firebasestorage.app",
+  messagingSenderId:"558400867996",
+  appId:"1:558400867996:web:e3b6d6cc79516d87efa759"
 };
 
 // ── Un onglet par Flow. Chaque produit a son propre projet Firebase (clients/licences
