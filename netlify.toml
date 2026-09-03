@@ -8,7 +8,7 @@
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseapp.com https://*.firebase.io https://www.gstatic.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com https://*.firebase.io wss://*.firebaseio.com https://flowalert-82de1.firebaseapp.com; frame-src https://dashboard.malary.eu;"
+    Content-Security-Policy = "default-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseapp.com https://*.firebase.io https://www.gstatic.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com https://*.firebase.io wss://*.firebaseio.com https://flowalert-82de1.firebaseapp.com https://flow-city-mmqh3t.firebaseapp.com https://flowsite-55a16.firebaseapp.com https://flowsafe-a0cde.firebaseapp.com; frame-src https://dashboard.malary.eu;"
 
 [[redirects]]
   from = "http://vision.malary.eu/*"
