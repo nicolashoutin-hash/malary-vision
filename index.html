@@ -230,16 +230,38 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Tier *</label>
+          <label class="form-label">Forfait *</label>
           <select class="form-select" id="cli-tier" onchange="prefillLicences()">
-            <option value="Starter">Starter — 149€/mois</option>
-            <option value="Pro">Pro — 249€/mois</option>
-            <option value="Enterprise">Enterprise — sur devis</option>
+            <option value="1-5">1 à 5 licences — 149€/mois</option>
+            <option value="6-10">6 à 10 licences — 249€/mois</option>
+            <option value="11-15">11 à 15 licences — 349€/mois</option>
+            <option value="16-25">16 à 25 licences — 549€/mois</option>
+            <option value="26+">26 licences et plus — sur devis</option>
           </select>
         </div>
         <div class="form-group">
           <label class="form-label">Nombre de licences *</label>
           <input class="form-input" id="cli-licences" type="number" min="1" value="5">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Contact de référence *</label>
+          <input class="form-input" id="cli-contact-name" type="text" placeholder="Prénom Nom">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fonction</label>
+          <input class="form-input" id="cli-contact-role" type="text" placeholder="Responsable / Direction">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email du contact</label>
+          <input class="form-input" id="cli-contact-email" type="email" placeholder="contact@client.fr">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Téléphone du contact</label>
+          <input class="form-input" id="cli-contact-phone" type="tel" placeholder="+33 ...">
         </div>
       </div>
       <div class="form-row">
@@ -388,8 +410,8 @@ function applyBranding(){
 }
 applyBranding();
 
-const TIER_PRIX={'Starter':149,'Pro':249,'Enterprise':0};
-const TIER_DEFAULT_LICS={'Starter':5,'Pro':15,'Enterprise':30};
+const TIER_PRIX={'1-5':149,'6-10':249,'11-15':349,'16-25':549,'26+':0,'Starter':149,'Pro':249,'Enterprise':0};
+const TIER_DEFAULT_LICS={'1-5':5,'6-10':10,'11-15':15,'16-25':25,'26+':26,'Starter':5,'Pro':15,'Enterprise':30};
 let allClients=[],unsubClients=null;
 let allLicences=[],unsubLicences=null;
 let currentClientId=null;
@@ -534,7 +556,7 @@ function renderDetail(){
   document.getElementById('d-lic-total').textContent=clientLics.length;
   const ca=TIER_PRIX[c.tier]||0;
   document.getElementById('d-ca').textContent=ca>0?(ca+'€'):'—';
-  document.getElementById('d-ca-sub').textContent=c.tier?('Tier '+c.tier):'—';
+  document.getElementById('d-ca-sub').textContent=c.tier?('Forfait '+c.tier):'—';
   const sevOrder={active:0,disponible:1,revoquee:2};
   const sorted=[...clientLics].sort((a,b)=>(sevOrder[a.statut]??9)-(sevOrder[b.statut]??9));
   document.getElementById('d-lic-table-body').innerHTML=sorted.length===0
@@ -581,8 +603,8 @@ window.prefillLicences=function(){
 };
 window.openCreateModal=function(){
   document.getElementById('create-result').innerHTML='';
-  ['cli-nom','cli-email','cli-password'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('cli-tier').value='Starter';
+  ['cli-nom','cli-email','cli-password','cli-contact-name','cli-contact-role','cli-contact-email','cli-contact-phone'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cli-tier').value='1-5';
   document.getElementById('cli-licences').value=5;
   document.getElementById('create-modal').classList.add('active');
 };
@@ -593,7 +615,11 @@ window.createClient=async function(){
   const licencesTotal=parseInt(document.getElementById('cli-licences').value,10);
   const email=document.getElementById('cli-email').value.trim();
   const password=document.getElementById('cli-password').value.trim();
-  if(!nom||!email||!password){toast('Nom, email et mot de passe requis','var(--red)');return;}
+  const contactName=document.getElementById('cli-contact-name').value.trim();
+  const contactRole=document.getElementById('cli-contact-role').value.trim();
+  const contactEmail=document.getElementById('cli-contact-email').value.trim();
+  const contactPhone=document.getElementById('cli-contact-phone').value.trim();
+  if(!nom||!email||!password||!contactName){toast('Nom du client, contact de référence, email admin et mot de passe requis','var(--red)');return;}
   if(password.length<8){toast('Mot de passe : 8 caractères minimum','var(--red)');return;}
   if(!licencesTotal||licencesTotal<1){toast('Nombre de licences invalide','var(--red)');return;}
   const btn=document.getElementById('create-client-btn');
@@ -612,7 +638,13 @@ window.createClient=async function(){
     await setDoc(doc(db,'clients',clientId),{
       nom,tier,licences_total:licencesTotal,statut:'actif',
       date_signature:new Date().toISOString(),
-      login_email:email,admin_uid:cred.user.uid
+      login_email:email,admin_uid:cred.user.uid,
+      contact_reference:{
+        nom:contactName,
+        fonction:contactRole||null,
+        email:contactEmail||null,
+        telephone:contactPhone||null
+      }
     });
     const codes=await genererEtSauvegarderLicences(clientId,licencesTotal);
     toast('Client "'+nom+'" créé avec '+licencesTotal+' licence(s)','var(--green)');
