@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Vision</title>
+<title>Dashboard Vision — Malary</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#07080a;--bg2:#0d0f12;--bg3:#141619;--bg4:#1c1f24;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);--text:#e8eaf0;--text2:#8892a4;--text3:#454d5c;--or:#C9A84C;--or2:#E8C97A;--or-bg:rgba(201,168,76,0.08);--or-border:rgba(201,168,76,0.2);--green:#34d399;--green-bg:rgba(52,211,153,0.08);--red:#f87171;--red-bg:rgba(248,113,113,0.08);--blue:#60a5fa;--blue-bg:rgba(96,165,250,0.08);--amber:#fbbf24;--amber-bg:rgba(251,191,36,0.08);}
@@ -54,7 +54,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .btn-red:hover{background:var(--red);color:#fff;}
 .btn-amber{background:var(--amber-bg);color:var(--amber);border-color:rgba(251,191,36,.3);}
 .btn-amber:hover{background:var(--amber);color:#07080a;}
-/* ── KPIs globaux ── */
 .global-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 .kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;position:relative;overflow:hidden;}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent,var(--or)),transparent);opacity:.6;}
@@ -68,8 +67,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .client-name{font-size:14px;font-weight:600;}
 .client-tier{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;}
 .client-statut-pill{margin-left:auto;font-size:10px;padding:3px 10px;border-radius:99px;font-family:'DM Mono',monospace;}
-.client-statut-pill.actif{background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.3);}
-.client-statut-pill.suspendu{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.3);}
+.client-statut-pill.active,.client-statut-pill.actif{background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.3);}
+.client-statut-pill.suspended,.client-statut-pill.suspendu{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.3);}
 .client-mrr{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;}
 .client-row-item .arrow{color:var(--text3);font-size:18px;}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;color:var(--text3);font-size:11px;gap:8px;text-align:center;}
@@ -83,17 +82,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .detail-card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;overflow:hidden;}
 .detail-card-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);}
 .detail-card-title{font-size:14px;font-weight:600;font-family:'Syne',sans-serif;}
-.lic-table{width:100%;border-collapse:collapse;}
-.lic-table th{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:8px 14px;text-align:left;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-weight:500;}
-.lic-table td{font-size:12px;padding:8px 14px;border-bottom:1px solid var(--border);color:var(--text2);font-family:'DM Mono',monospace;}
-.lic-table tr:last-child td{border-bottom:none;}
-.lic-pill{font-size:10px;padding:2px 8px;border-radius:99px;font-family:'DM Sans',sans-serif;}
-.lic-pill.active{background:var(--green-bg);color:var(--green);}
-.lic-pill.disponible{background:var(--blue-bg);color:var(--blue);}
-.lic-pill.revoquee{background:var(--red-bg);color:var(--red);}
+.sub-table{width:100%;border-collapse:collapse;}
+.sub-table th{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:8px 14px;text-align:left;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-weight:500;}
+.sub-table td{font-size:12px;padding:8px 14px;border-bottom:1px solid var(--border);color:var(--text2);font-family:'DM Mono',monospace;}
+.sub-table tr:last-child td{border-bottom:none;}
+.sub-pill{font-size:10px;padding:2px 8px;border-radius:99px;font-family:'DM Sans',sans-serif;}
+.sub-pill.active{background:var(--green-bg);color:var(--green);}
+.sub-pill.suspended{background:var(--red-bg);color:var(--red);}
 .modal-overlay{position:fixed;inset:0;background:rgba(7,8,10,.85);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-overlay.active{display:flex;}
-.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;}
 .modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:1;}
 .modal-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;}
 .modal-close{width:28px;height:28px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
@@ -109,27 +107,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .form-select:focus{border-color:var(--or);}
 .form-hint{font-size:10px;color:var(--text3);margin-top:-4px;}
 .result-box{background:var(--bg3);border:1px solid var(--or-border);border-radius:9px;padding:14px;margin-top:12px;}
-.result-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:var(--or);margin-bottom:10px;}
-.lic-codes{display:flex;flex-direction:column;gap:4px;max-height:240px;overflow-y:auto;}
-.lic-code{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);background:var(--bg4);border:1px solid var(--border);border-radius:5px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;}
-.lic-code .copy-btn{font-size:10px;color:var(--or);cursor:pointer;border:none;background:none;}
+.result-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:var(--or);margin-bottom:8px;}
+.result-row{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;padding:4px 0;}
+.result-row b{color:var(--text);}
 .intervention-bar{display:flex;align-items:center;gap:10px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--or-border);flex-shrink:0;}
 .intervention-badge{display:flex;align-items:center;gap:6px;font-size:11px;padding:4px 10px;border-radius:99px;background:var(--or-bg);color:var(--or);border:1px solid var(--or-border);font-family:'DM Mono',monospace;}
 .intervention-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--or);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .intervention-iframe{flex:1;width:100%;border:none;background:var(--bg);}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--bg4);border:1px solid var(--or-border);border-radius:7px;padding:9px 14px;font-size:11px;color:var(--text);z-index:1000;display:none;}
-/* ── Licences supplémentaires (modal ajout) ── */
-.add-lic-btn{font-size:11px;padding:5px 12px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
-.add-lic-btn:hover{border-color:var(--or);color:var(--or);}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg4);border:1px solid var(--or-border);border-radius:7px;padding:9px 14px;font-size:11px;color:var(--text);z-index:1000;display:none;max-width:360px;}
+.section-sep{height:1px;background:var(--border);margin:4px 0;}
 </style>
 </head>
 <body>
+
+<!-- LOGIN -->
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-logo-badge" id="login-badge">DV</div>
-      <div><div class="login-title" id="login-title">Dashboard Vision</div><div class="login-sub">Malary</div></div>
+      <div class="login-logo-badge">DV</div>
+      <div><div class="login-title">Dashboard Vision</div><div class="login-sub">Malary — Contrôle central</div></div>
     </div>
     <div class="login-field">
       <label class="login-label">Email</label>
@@ -143,39 +140,43 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
     <button class="login-btn" id="login-btn" onclick="doLogin()">Se connecter</button>
   </div>
 </div>
+
+<!-- APP -->
 <div id="app" style="display:none;flex-direction:column;height:100%;">
   <div class="topbar">
     <div class="topbar-left">
-      <div class="logo-badge" id="topbar-badge">DV</div>
-      <div class="page-title" id="page-title">Dashboard Vision</div>
+      <div class="logo-badge">DV</div>
+      <div class="page-title">Dashboard Vision</div>
       <div class="product-switch" id="product-switch"></div>
-      <div class="fb-badge" id="fb-status">Connexion…</div>
+      <div class="fb-badge" id="fb-status">malary-identite</div>
     </div>
     <div class="topbar-right">
       <div class="clock" id="clock">--:--:--</div>
-      <button class="topbar-btn" id="back-to-list-btn" onclick="showView('list')" style="display:none;">← Liste des clients</button>
+      <button class="topbar-btn" id="back-to-list-btn" onclick="showView('list')" style="display:none;">← Clients</button>
       <button class="topbar-btn" id="back-to-detail-btn" onclick="showView('detail')" style="display:none;">← Fiche client</button>
       <button class="topbar-btn logout" onclick="doLogout()">Déconnexion</button>
     </div>
   </div>
   <div class="app-body">
+
     <!-- VUE LISTE -->
     <div class="view active" id="view-list">
       <div class="view-header">
         <div>
-          <div class="view-title">Clients</div>
+          <div class="view-title" id="list-title">Clients</div>
           <div class="view-sub" id="list-sub">Chargement…</div>
         </div>
         <button class="btn btn-or" onclick="openCreateModal()">+ Nouveau client</button>
       </div>
-      <div class="global-kpis" id="global-kpis">
+      <div class="global-kpis">
         <div class="kpi-card" style="--accent:var(--green)"><div class="kpi-label">Clients actifs</div><div class="kpi-value" id="kpi-clients">—</div><div class="kpi-sub" id="kpi-clients-sub">—</div></div>
         <div class="kpi-card" style="--accent:var(--or)"><div class="kpi-label">MRR</div><div class="kpi-value" id="kpi-mrr">—</div><div class="kpi-sub">€ / mois</div></div>
-        <div class="kpi-card" style="--accent:var(--blue)"><div class="kpi-label">Licences vendues</div><div class="kpi-value" id="kpi-lics">—</div><div class="kpi-sub" id="kpi-lics-sub">—</div></div>
+        <div class="kpi-card" style="--accent:var(--blue)"><div class="kpi-label">Sièges alloués</div><div class="kpi-value" id="kpi-seats">—</div><div class="kpi-sub" id="kpi-seats-sub">—</div></div>
         <div class="kpi-card" style="--accent:var(--amber)"><div class="kpi-label">ARR estimé</div><div class="kpi-value" id="kpi-arr">—</div><div class="kpi-sub">€ / an</div></div>
       </div>
       <div class="clients-list" id="clients-list"></div>
     </div>
+
     <!-- VUE FICHE CLIENT -->
     <div class="view" id="view-detail">
       <div class="view-header">
@@ -189,31 +190,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
         </div>
       </div>
       <div class="detail-metrics">
-        <div class="metric-card" style="--accent:var(--green)"><div class="metric-label">Licences actives</div><div class="metric-value" id="d-lic-active">—</div><div class="metric-sub" id="d-lic-active-sub">—</div></div>
-        <div class="metric-card" style="--accent:var(--blue)"><div class="metric-label">Licences en attente</div><div class="metric-value" id="d-lic-pending">—</div><div class="metric-sub">disponibles, non attribuées</div></div>
-        <div class="metric-card" style="--accent:var(--amber)"><div class="metric-label">CA de ce client</div><div class="metric-value" id="d-ca">—</div><div class="metric-sub" id="d-ca-sub">€ / mois</div></div>
+        <div class="metric-card" style="--accent:var(--blue)"><div class="metric-label">Sièges alloués</div><div class="metric-value" id="d-seats-alloc">—</div><div class="metric-sub" id="d-seats-sub">ce produit</div></div>
+        <div class="metric-card" style="--accent:var(--or)"><div class="metric-label">Plan</div><div class="metric-value" id="d-plan" style="font-size:20px;padding-top:6px;">—</div><div class="metric-sub" id="d-plan-sub">—</div></div>
+        <div class="metric-card" style="--accent:var(--green)"><div class="metric-label">Statut</div><div class="metric-value" id="d-statut" style="font-size:20px;padding-top:6px;">—</div><div class="metric-sub" id="d-created-at">—</div></div>
       </div>
+      <!-- Abonnements de ce client -->
       <div class="detail-card">
         <div class="detail-card-header">
-          <div class="detail-card-title">Licences (<span id="d-lic-total">0</span>)</div>
-          <button class="add-lic-btn" onclick="openAddLicModal()">+ Ajouter des licences</button>
+          <div class="detail-card-title">Abonnements</div>
+          <button class="btn btn-amber" onclick="openModifyQuotaModal()" id="modify-quota-btn">Modifier le quota</button>
         </div>
-        <table class="lic-table">
-          <thead><tr><th>Code</th><th>Statut</th><th>Attribué à</th></tr></thead>
-          <tbody id="d-lic-table-body"></tbody>
+        <table class="sub-table">
+          <thead><tr><th>Produit</th><th>Plan</th><th>Sièges</th><th>Statut</th></tr></thead>
+          <tbody id="d-sub-table-body"><tr><td colspan="4" style="text-align:center;color:var(--text3);padding:20px;font-family:DM Sans,sans-serif;">Chargement…</td></tr></tbody>
         </table>
       </div>
+      <!-- Admin du client -->
+      <div class="detail-card">
+        <div class="detail-card-header">
+          <div class="detail-card-title">Accès admin client</div>
+        </div>
+        <div style="padding:14px;font-size:12px;font-family:DM Mono,monospace;color:var(--text2);" id="d-admin-info">—</div>
+      </div>
     </div>
+
     <!-- VUE INTERVENTION IFRAME -->
     <div class="view" id="view-intervention" style="padding:0;flex-direction:column;">
       <div class="intervention-bar">
         <div class="intervention-badge"><div class="dot"></div><span id="intervention-label">—</span></div>
-        <span style="font-size:10px;color:var(--text3);">Mode intervention — accès complet au Dashboard Manager du client</span>
+        <span style="font-size:10px;color:var(--text3);">Mode intervention — Dashboard Manager du client</span>
       </div>
       <iframe class="intervention-iframe" id="intervention-iframe" src="about:blank"></iframe>
     </div>
+
   </div>
 </div>
+
 <!-- MODAL NOUVEAU CLIENT -->
 <div class="modal-overlay" id="create-modal">
   <div class="modal-box">
@@ -225,49 +237,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       <div class="form-row">
         <div class="form-group full">
           <label class="form-label">Nom du client *</label>
-          <input class="form-input" id="cli-nom" type="text" placeholder="ex: SecurEvent Lyon">
+          <input class="form-input" id="cli-nom" type="text" placeholder="ex: Mairie de Neydens">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Forfait *</label>
-          <select class="form-select" id="cli-tier" onchange="prefillLicences()">
-            <option value="1-5">1 à 5 licences — 149€/mois</option>
-            <option value="6-10">6 à 10 licences — 249€/mois</option>
-            <option value="11-15">11 à 15 licences — 349€/mois</option>
-            <option value="16-25">16 à 25 licences — 549€/mois</option>
-            <option value="26+">26 licences et plus — sur devis</option>
+          <label class="form-label">Plan *</label>
+          <select class="form-select" id="cli-tier" onchange="prefillSeats()">
+            <option value="Starter">Starter — 149€/mois</option>
+            <option value="Pro">Pro — 249€/mois</option>
+            <option value="Enterprise">Enterprise — sur devis</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Nombre de licences *</label>
-          <input class="form-input" id="cli-licences" type="number" min="1" value="5">
+          <label class="form-label">Sièges (licences) *</label>
+          <input class="form-input" id="cli-seats" type="number" min="1" value="5">
         </div>
       </div>
+      <div class="section-sep"></div>
+      <p style="font-size:11px;color:var(--text3);margin:8px 0 12px;">Compte administrateur — accès DashboardManager</p>
       <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Contact de référence *</label>
-          <input class="form-input" id="cli-contact-name" type="text" placeholder="Prénom Nom">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Fonction</label>
-          <input class="form-input" id="cli-contact-role" type="text" placeholder="Responsable / Direction">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Email du contact</label>
-          <input class="form-input" id="cli-contact-email" type="email" placeholder="contact@client.fr">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Téléphone du contact</label>
-          <input class="form-input" id="cli-contact-phone" type="tel" placeholder="+33 ...">
+        <div class="form-group full">
+          <label class="form-label">Nom de l'admin *</label>
+          <input class="form-input" id="cli-admin-name" type="text" placeholder="ex: Jean Dupont">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group full">
-          <label class="form-label">Email admin client *</label>
-          <input class="form-input" id="cli-email" type="email" placeholder="admin@client.fr">
+          <label class="form-label">Email admin *</label>
+          <input class="form-input" id="cli-email" type="email" placeholder="admin@mairie-neydens.fr">
           <div class="form-hint">Ce compte permettra au client d'accéder à son Dashboard Manager en autonomie.</div>
         </div>
       </div>
@@ -275,441 +273,570 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
         <div class="form-group full">
           <label class="form-label">Mot de passe initial *</label>
           <input class="form-input" id="cli-password" type="text" placeholder="Min. 8 caractères">
-          <div class="form-hint">À communiquer toi-même au client après création.</div>
+          <div class="form-hint">À communiquer au client. Il pourra le changer à la première connexion.</div>
         </div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button class="btn btn-or" id="create-client-btn" onclick="createClient()" style="flex:1;">+ Créer le client et générer les licences</button>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn btn-or" id="create-client-btn" onclick="createClient()" style="flex:1;">Créer le client et provisionner l'accès</button>
         <button class="btn btn-red" onclick="closeCreateModal()">Annuler</button>
       </div>
       <div id="create-result"></div>
     </div>
   </div>
 </div>
-<!-- MODAL AJOUT LICENCES -->
-<div class="modal-overlay" id="add-lic-modal">
-  <div class="modal-box">
+
+<!-- MODAL MODIFIER QUOTA -->
+<div class="modal-overlay" id="modify-quota-modal">
+  <div class="modal-box" style="width:400px;">
     <div class="modal-hdr">
-      <div class="modal-title">Ajouter des licences</div>
-      <button class="modal-close" onclick="closeAddLicModal()">✕</button>
+      <div class="modal-title">Modifier le quota</div>
+      <button class="modal-close" onclick="closeModifyQuotaModal()">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-row">
-        <div class="form-group full">
-          <label class="form-label">Nombre de licences à ajouter *</label>
-          <input class="form-input" id="add-lic-count" type="number" min="1" value="5">
+        <div class="form-group">
+          <label class="form-label">Nouveau plan</label>
+          <select class="form-select" id="mq-tier">
+            <option value="Starter">Starter — 149€/mois</option>
+            <option value="Pro">Pro — 249€/mois</option>
+            <option value="Enterprise">Enterprise — sur devis</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nombre de sièges</label>
+          <input class="form-input" id="mq-seats" type="number" min="1" value="5">
         </div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button class="btn btn-or" id="add-lic-btn" onclick="addLicences()" style="flex:1;">+ Générer les licences</button>
-        <button class="btn btn-red" onclick="closeAddLicModal()">Annuler</button>
+      <div class="form-hint" style="margin-bottom:12px;">Note : la mise à jour de l'entitlement dans le projet produit nécessite les Cloud Functions Malary (activation Blaze requise). Le control plane malary-identite sera mis à jour immédiatement.</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-or" id="mq-btn" onclick="saveQuota()" style="flex:1;">Enregistrer</button>
+        <button class="btn btn-red" onclick="closeModifyQuotaModal()">Annuler</button>
       </div>
-      <div id="add-lic-result"></div>
     </div>
   </div>
 </div>
+
 <div class="toast" id="toast"></div>
+
 <script type="module">
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import{getFirestore,collection,onSnapshot,updateDoc,doc,setDoc,getDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import{getAuth,signInWithEmailAndPassword,signOut}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import{initializeApp as initApp2}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import{getAuth as getAuth2,createUserWithEmailAndPassword as createUser2}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-// ── Identité admin Malary : projet Firebase dédié (malary-identite), indépendant
-// des projets des Flows — compte interne dashboard@malary.eu.
-const AUTH_CONFIG={
-  apiKey:"AIzaSyCYba_gBYv2mT-BzyjZ-oxbgCNhNfIDav8",
-  authDomain:"malary-identite.firebaseapp.com",
-  projectId:"malary-identite",
-  storageBucket:"malary-identite.firebasestorage.app",
-  messagingSenderId:"558400867996",
-  appId:"1:558400867996:web:e3b6d6cc79516d87efa759"
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getFirestore, collection, doc, getDoc, setDoc, updateDoc,
+  onSnapshot, query, collectionGroup, where, serverTimestamp
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import {
+  getAuth, signInWithEmailAndPassword, signOut
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+// ── Control plane — malary-identite ────────────────────────────────────────
+const VISION_CONFIG = {
+  apiKey: 'AIzaSyCYba_gBYv2mT-BzyjZ-oxbgCNhNfIDav8',
+  authDomain: 'malary-identite.firebaseapp.com',
+  projectId: 'malary-identite',
+  storageBucket: 'malary-identite.firebasestorage.app',
+  messagingSenderId: '558400867996',
+  appId: '1:558400867996:web:e3b6d6cc79516d87efa759'
 };
 
-// ── Un onglet par Flow. Chaque produit a son propre projet Firebase (clients/licences
-// vivent dans le même projet Firebase que l'app mobile du produit). Pour ajouter un
-// nouveau Flow (FlowSite, FlowSafe...) une fois son projet Firebase créé : ajouter une
-// entrée ici avec sa config web (Firebase Console → Paramètres du projet → Application Web).
-const PRODUCTS={
-  // ⚠️ NE PAS réutiliser AUTH_CONFIG ici : depuis le 2/09 AUTH_CONFIG pointe sur le projet
-  // malary-identite (auth uniquement, pas de Firestore actif) — il faut la config propre du
-  // projet flowalert-82de1, sinon toute lecture/écriture "clients"/"licences" échoue avec
-  // "Failed to get document because the client is offline" (Firestore inexistant sur ce projet).
-  flowalert:{key:'flowalert',badge:'FA',name:'FlowAlert',licPrefix:'FLWA',firebaseConfig:{
-    apiKey:"AIzaSyBjcAEGYHbhddyrg5bEgnXUq_mWSwe27cw",
-    authDomain:"flowalert-82de1.firebaseapp.com",
-    projectId:"flowalert-82de1",
-    storageBucket:"flowalert-82de1.firebasestorage.app",
-    messagingSenderId:"983126758574",
-    appId:"1:983126758574:web:bf2c8ebbf83f5a9e48493f"
-  }},
-  flowcity:{key:'flowcity',badge:'FC',name:'FlowCity',licPrefix:'FLWC',firebaseConfig:{
-    apiKey:"AIzaSyCx9SMFhCp-w-VGK38SqEqhSGpQ4Rt53R8",
-    authDomain:"flow-city-mmqh3t.firebaseapp.com",
-    projectId:"flow-city-mmqh3t",
-    storageBucket:"flow-city-mmqh3t.firebasestorage.app",
-    messagingSenderId:"318622427671",
-    appId:"1:318622427671:web:f38bdeb12b5276a6478a52"
-  }},
-  flowsite:{key:'flowsite',badge:'FS',name:'FlowSite',licPrefix:'FLWS',firebaseConfig:{
-    apiKey:"AIzaSyC1HuDV4FC22h1M4isbwKg6szmpS7P--vk",
-    authDomain:"flowsite-55a16.firebaseapp.com",
-    projectId:"flowsite-55a16",
-    storageBucket:"flowsite-55a16.firebasestorage.app",
-    messagingSenderId:"850713829167",
-    appId:"1:850713829167:web:a8c5023a42d06839808bda"
-  }},
-  flowsafe:{key:'flowsafe',badge:'SF',name:'FlowSafe',licPrefix:'FLSF',firebaseConfig:{
-    apiKey:"AIzaSyApIoBVYJpdqTDc6EbHG7i5fRyj_TQoN_U",
-    authDomain:"flowsafe-a0cde.firebaseapp.com",
-    projectId:"flowsafe-a0cde",
-    storageBucket:"flowsafe-a0cde.firebasestorage.app",
-    messagingSenderId:"794535122171",
-    appId:"1:794535122171:web:8436d120c8102499d68c5e"
-  }},
-      flowschool:{key:'flowschool',badge:'FE',name:'FlowSchool',licPrefix:'FLWE',firebaseConfig:{
-              apiKey:"AIzaSyDS2OeH-YIzX3cSQ3VTvZbdXPcAe7YCFN0",
-              authDomain:"flowschool-becce.firebaseapp.com",
-              projectId:"flowschool-becce",
-              storageBucket:"flowschool-becce.firebasestorage.app",
-              messagingSenderId:"341872571218",
-              appId:"1:341872571218:web:2a73fdbdaf5ae9f08d008b"
-      }},
-      flowhotel:{key:'flowhotel',badge:'FH',name:'FlowHotel',licPrefix:'FLWH',firebaseConfig:{
-              apiKey:"AIzaSyDBKQA23tI08p2rzDhbJw3fIlU8xeEi2l4",
-              authDomain:"flowhotel-3abb3.firebaseapp.com",
-              projectId:"flowhotel-3abb3",
-              storageBucket:"flowhotel-3abb3.firebasestorage.app",
-              messagingSenderId:"727491880500",
-              appId:"1:727491880500:web:37ace0df0ceed51dea4c61"
-      }}
-};
-const urlParamsBoot=new URLSearchParams(window.location.search);
-const CURRENT_PRODUCT=PRODUCTS[urlParamsBoot.get('product')]||PRODUCTS.flowalert;
-
-// Connexion admin (auth) : toujours sur AUTH_CONFIG (malary-identite). Données (db) +
-// création des comptes clients (authSecondary) : sur le projet Firebase du produit actif.
-// ⚠️ malary-identite est un projet Firebase séparé du projet de données (flowalert-82de1,
-// flow-city-mmqh3t...) : un jeton délivré par malary-identite n'est PAS reconnu par les
-// règles de sécurité Firestore du projet de données (chaque projet Firebase a son propre
-// service d'authentification). Il faut donc aussi ouvrir une session sur le projet de
-// données lui-même (dataAuth ci-dessous) avec les mêmes identifiants, sinon toute lecture/
-// écriture sur "clients"/"licences" échoue avec "Missing or insufficient permissions".
-const authApp=initializeApp(AUTH_CONFIG,'vision-auth');
-const auth=getAuth(authApp);
-const dataApp=initializeApp(CURRENT_PRODUCT.firebaseConfig,'vision-data');
-const db=getFirestore(dataApp);
-const dataAuth=getAuth(dataApp);
-const appSecondary=initApp2(CURRENT_PRODUCT.firebaseConfig,'vision-secondary');
-const authSecondary=getAuth2(appSecondary);
-
-function applyBranding(){
-  document.getElementById('product-switch').innerHTML=Object.values(PRODUCTS).map(p=>
-    '<a class="product-tab'+(p.key===CURRENT_PRODUCT.key?' active':'')+'" href="?product='+p.key+'">'+p.name+'</a>'
-  ).join('');
-}
-applyBranding();
-
-const TIER_PRIX={'1-5':149,'6-10':249,'11-15':349,'16-25':549,'26+':0,'Starter':149,'Pro':249,'Enterprise':0};
-const TIER_DEFAULT_LICS={'1-5':5,'6-10':10,'11-15':15,'16-25':25,'26+':26,'Starter':5,'Pro':15,'Enterprise':30};
-let allClients=[],unsubClients=null;
-let allLicences=[],unsubLicences=null;
-let currentClientId=null;
-// ── Auth ────────────────────────────────────────────────────────────────────
-window.doLogin=async function(){
-  const email=document.getElementById('login-email').value.trim();
-  const pwd=document.getElementById('login-password').value;
-  const btn=document.getElementById('login-btn');
-  const err=document.getElementById('login-error');
-  err.style.display='none';btn.disabled=true;btn.textContent='Connexion…';
-  try{
-    await signInWithEmailAndPassword(auth,email,pwd);
-  }catch(e){
-    err.textContent='Identifiants incorrects';err.style.display='block';
-    btn.disabled=false;btn.textContent='Se connecter';
-    return;
+// ── Product configurations ──────────────────────────────────────────────────
+const PRODUCTS = {
+  flowalert: {
+    key: 'flowalert', badge: 'FA', name: 'FlowAlert', projectId: 'flowalert-82de1',
+    dashUrl: 'https://dashboardmanager.malary.eu/index.html',
+    firebaseConfig: {
+      apiKey: 'AIzaSyBjcAEGYHbhddyrg5bEgnXUq_mWSwe27cw',
+      authDomain: 'flowalert-82de1.firebaseapp.com', projectId: 'flowalert-82de1',
+      storageBucket: 'flowalert-82de1.firebasestorage.app',
+      messagingSenderId: '983126758574', appId: '1:983126758574:web:bf2c8ebbf83f5a9e48493f'
+    }
+  },
+  flowcity: {
+    key: 'flowcity', badge: 'FC', name: 'FlowCity', projectId: 'flow-city-mmqh3t',
+    dashUrl: 'https://dashboardmanager-flowcity.malary.eu/index.html',
+    firebaseConfig: {
+      apiKey: 'AIzaSyCx9SMFhCp-w-VGK38SqEqhSGpQ4Rt53R8',
+      authDomain: 'flow-city-mmqh3t.firebaseapp.com', projectId: 'flow-city-mmqh3t',
+      storageBucket: 'flow-city-mmqh3t.firebasestorage.app',
+      messagingSenderId: '318622427671', appId: '1:318622427671:web:f38bdeb12b5276a6478a52'
+    }
+  },
+  flowsite: {
+    key: 'flowsite', badge: 'FS', name: 'FlowSite', projectId: 'flowsite-55a16',
+    dashUrl: 'https://dashboardmanager-flowsite.malary.eu/index.html',
+    firebaseConfig: {
+      apiKey: 'AIzaSyC1HuDV4FC22h1M4isbwKg6szmpS7P--vk',
+      authDomain: 'flowsite-55a16.firebaseapp.com', projectId: 'flowsite-55a16',
+      storageBucket: 'flowsite-55a16.firebasestorage.app',
+      messagingSenderId: '850713829167', appId: '1:850713829167:web:a8c5023a42d06839808bda'
+    }
+  },
+  flowsafe: {
+    key: 'flowsafe', badge: 'SF', name: 'FlowSafe', projectId: 'flowsafe-a0cde',
+    dashUrl: 'https://dashboardmanager-flowsafe.malary.eu/index.html',
+    firebaseConfig: {
+      apiKey: 'AIzaSyApIoBVYJpdqTDc6EbHG7i5fRyj_TQoN_U',
+      authDomain: 'flowsafe-a0cde.firebaseapp.com', projectId: 'flowsafe-a0cde',
+      storageBucket: 'flowsafe-a0cde.firebasestorage.app',
+      messagingSenderId: '794535122171', appId: '1:794535122171:web:8436d120c8102499d68c5e'
+    }
+  },
+  flowschool: {
+    key: 'flowschool', badge: 'FE', name: 'FlowSchool', projectId: 'flowschool-becce',
+    dashUrl: 'https://dashboardmanager-flowschool.malary.eu/index.html',
+    firebaseConfig: {
+      apiKey: 'AIzaSyDS2OeH-YIzX3cSQ3VTvZbdXPcAe7YCFN0',
+      authDomain: 'flowschool-becce.firebaseapp.com', projectId: 'flowschool-becce',
+      storageBucket: 'flowschool-becce.firebasestorage.app',
+      messagingSenderId: '341872571218', appId: '1:341872571218:web:2a73fdbdaf5ae9f08d008b'
+    }
+  },
+  flowhotel: {
+    key: 'flowhotel', badge: 'FH', name: 'FlowHotel', projectId: 'flowhotel-3abb3',
+    dashUrl: 'https://dashboardmanager-flowhotel.malary.eu/index.html',
+    firebaseConfig: {
+      apiKey: 'AIzaSyDBKQA23tI08p2rzDhbJw3fIlU8xeEi2l4',
+      authDomain: 'flowhotel-3abb3.firebaseapp.com', projectId: 'flowhotel-3abb3',
+      storageBucket: 'flowhotel-3abb3.firebasestorage.app',
+      messagingSenderId: '727491880500', appId: '1:727491880500:web:37ace0df0ceed51dea4c61'
+    }
   }
-  try{
-    // Ouvre aussi une session sur le projet Firebase du produit actif, avec les mêmes
-    // identifiants, pour que les lectures/écritures Firestore (clients, licences) soient
-    // autorisées par les règles de sécurité de ce projet.
-    await signInWithEmailAndPassword(dataAuth,email,pwd);
-  }catch(e2){
-    err.textContent='Connecté, mais accès aux données '+CURRENT_PRODUCT.name+' refusé : le compte '+email+' n\'existe pas (ou mot de passe différent) sur le projet Firebase "'+CURRENT_PRODUCT.firebaseConfig.projectId+'". À créer dans Firebase Console → ce projet → Authentication → Users, avec le même mot de passe.';
-    err.style.display='block';
-    btn.disabled=false;btn.textContent='Se connecter';
-    return;
-  }
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').style.display='flex';
-  document.getElementById('fb-status').textContent='Connecté';
-  startListeners();
-  btn.disabled=false;btn.textContent='Se connecter';
 };
-window.doLogout=async function(){
-  if(unsubClients) unsubClients();
-  if(unsubLicences) unsubLicences();
-  await signOut(auth);
-  try{await signOut(dataAuth);}catch(e){}
-  document.getElementById('app').style.display='none';
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('login-password').value='';
-};
+
+const TIER_PRIX = { Starter: 149, Pro: 249, Enterprise: 0 };
+const TIER_DEFAULT_SEATS = { Starter: 5, Pro: 15, Enterprise: 30 };
+
+const urlParams = new URLSearchParams(window.location.search);
+const CURRENT_PRODUCT = PRODUCTS[urlParams.get('product')] || PRODUCTS.flowalert;
+
+// ── Firebase app instances ──────────────────────────────────────────────────
+// Vision core: always malary-identite
+const visionApp = initializeApp(VISION_CONFIG, 'vision-core');
+const visionAuth = getAuth(visionApp);
+const visionDb = getFirestore(visionApp);
+// provisionClientAdmin + updateEntitlement sont des Cloud Functions malary-identite
+const visionFunctions = getFunctions(visionApp, 'europe-west1');
+
+// ── State ───────────────────────────────────────────────────────────────────
+let allClients = [];
+let allSubscriptions = {}; // { clientId: { [product]: {...} } }
+let currentClientId = null;
+let unsubClients = null;
+let unsubSubs = null;
+
+// ── Product switch ──────────────────────────────────────────────────────────
+document.getElementById('product-switch').innerHTML = Object.values(PRODUCTS)
+  .map(p => `<a class="product-tab${p.key === CURRENT_PRODUCT.key ? ' active' : ''}" href="?product=${p.key}">${p.name}</a>`)
+  .join('');
+
 // ── Clock ───────────────────────────────────────────────────────────────────
-setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleTimeString('fr-FR'),1000);
+setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString('fr-FR'); }, 1000);
+
 // ── Toast ───────────────────────────────────────────────────────────────────
-function toast(msg,color='var(--or)'){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.style.borderColor=color;t.style.display='block';
-  setTimeout(()=>t.style.display='none',3500);
+function toast(msg, color = 'var(--or)') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = color;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 4000);
 }
-// ── Listeners ───────────────────────────────────────────────────────────────
-function startListeners(){
-  unsubClients=onSnapshot(collection(db,'clients'),snap=>{
-    allClients=snap.docs.map(d=>({id:d.id,...d.data()}));
+
+// ── Auth ────────────────────────────────────────────────────────────────────
+window.doLogin = async function () {
+  const email = document.getElementById('login-email').value.trim();
+  const pwd = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  err.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Connexion…';
+  try {
+    await signInWithEmailAndPassword(visionAuth, email, pwd);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    startListeners();
+  } catch (e) {
+    err.textContent = 'Identifiants incorrects ou compte non autorisé (droits malary_admin requis).';
+    err.style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Se connecter';
+};
+
+window.doLogout = async function () {
+  if (unsubClients) unsubClients();
+  if (unsubSubs) unsubSubs();
+  await signOut(visionAuth);
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-password').value = '';
+};
+
+// ── Listeners (malary-identite only) ────────────────────────────────────────
+function startListeners() {
+  // All clients
+  unsubClients = onSnapshot(collection(visionDb, 'clients'), snap => {
+    allClients = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderList();
-    if(currentClientId) renderDetail();
-  },err=>{toast('Erreur de lecture "clients" : '+err.message,'var(--red)');});
-  unsubLicences=onSnapshot(collection(db,'licences'),snap=>{
-    allLicences=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if (currentClientId) renderDetail();
+  }, e => toast('Erreur clients : ' + e.message, 'var(--red)'));
+
+  // All subscriptions for the current product (collection group query)
+  const subsQuery = query(
+    collectionGroup(visionDb, 'subscriptions'),
+    where('product', '==', CURRENT_PRODUCT.key)
+  );
+  unsubSubs = onSnapshot(subsQuery, snap => {
+    allSubscriptions = {};
+    snap.docs.forEach(d => {
+      // Path: clients/{clientId}/subscriptions/{product}
+      const clientId = d.ref.parent.parent.id;
+      if (!allSubscriptions[clientId]) allSubscriptions[clientId] = {};
+      allSubscriptions[clientId][d.id] = { id: d.id, ...d.data() };
+    });
     renderList();
-    if(currentClientId) renderDetail();
-  },err=>{toast('Erreur de lecture "licences" : '+err.message,'var(--red)');});
+    if (currentClientId) renderDetail();
+  }, e => toast('Erreur abonnements : ' + e.message, 'var(--red)'));
 }
-// ── Navigation ──────────────────────────────────────────────────────────────
-window.showView=function(view){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('back-to-list-btn').style.display='none';
-  document.getElementById('back-to-detail-btn').style.display='none';
-  if(view==='list'){
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+window.showView = function (view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('back-to-list-btn').style.display = 'none';
+  document.getElementById('back-to-detail-btn').style.display = 'none';
+  if (view === 'list') {
     document.getElementById('view-list').classList.add('active');
-    currentClientId=null;
-    document.getElementById('intervention-iframe').src='about:blank';
-  }else if(view==='detail'){
+    currentClientId = null;
+    document.getElementById('intervention-iframe').src = 'about:blank';
+  } else if (view === 'detail') {
     document.getElementById('view-detail').classList.add('active');
-    document.getElementById('back-to-list-btn').style.display='inline-block';
-    document.getElementById('intervention-iframe').src='about:blank';
-  }else if(view==='intervention'){
+    document.getElementById('back-to-list-btn').style.display = 'inline-block';
+    document.getElementById('intervention-iframe').src = 'about:blank';
+  } else if (view === 'intervention') {
     document.getElementById('view-intervention').classList.add('active');
-    document.getElementById('back-to-detail-btn').style.display='inline-block';
+    document.getElementById('back-to-detail-btn').style.display = 'inline-block';
   }
 };
+
 // ── Render liste ─────────────────────────────────────────────────────────────
-function renderList(){
-  const actifs=allClients.filter(c=>c.statut==='actif'||!c.statut);
-  const mrr=allClients.filter(c=>c.statut!=='suspendu').reduce((acc,c)=>acc+(TIER_PRIX[c.tier]||0),0);
-  const arr=mrr*12;
-  const licsTotal=allLicences.length;
-  const licsActives=allLicences.filter(l=>l.statut==='active').length;
-  document.getElementById('list-sub').textContent=actifs.length+' client(s) actif(s) sur '+allClients.length;
-  document.getElementById('kpi-clients').textContent=actifs.length;
-  document.getElementById('kpi-clients-sub').textContent=allClients.length+' au total';
-  document.getElementById('kpi-mrr').textContent=mrr+'€';
-  document.getElementById('kpi-lics').textContent=licsTotal;
-  document.getElementById('kpi-lics-sub').textContent=licsActives+' actives';
-  document.getElementById('kpi-arr').textContent=arr+'€';
-  const grid=document.getElementById('clients-list');
-  if(allClients.length===0){
-    grid.innerHTML='<div class="empty-state"><div class="ico">🏢</div><div>Aucun client pour le moment</div><div style="font-size:10px;">Clique sur "+ Nouveau client" pour créer le premier compte.</div></div>';
+function renderList() {
+  const actifs = allClients.filter(c => c.status === 'active');
+  // MRR from subscriptions of current product
+  let mrr = 0, totalSeats = 0;
+  Object.values(allSubscriptions).forEach(subs => {
+    const sub = subs[CURRENT_PRODUCT.key];
+    if (sub && sub.status === 'active') {
+      mrr += TIER_PRIX[sub.plan] || 0;
+      totalSeats += sub.seatsAllocated || 0;
+    }
+  });
+  const arr = mrr * 12;
+
+  document.getElementById('list-title').textContent = CURRENT_PRODUCT.name + ' — Clients';
+  document.getElementById('list-sub').textContent = actifs.length + ' client(s) actif(s) sur ' + allClients.length;
+  document.getElementById('kpi-clients').textContent = actifs.length;
+  document.getElementById('kpi-clients-sub').textContent = allClients.length + ' au total';
+  document.getElementById('kpi-mrr').textContent = mrr + '€';
+  document.getElementById('kpi-seats').textContent = totalSeats;
+  document.getElementById('kpi-seats-sub').textContent = CURRENT_PRODUCT.name;
+  document.getElementById('kpi-arr').textContent = arr + '€';
+
+  const grid = document.getElementById('clients-list');
+  if (allClients.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="ico">🏢</div><div>Aucun client</div><div style="font-size:10px;">Cliquez sur "+ Nouveau client" pour créer le premier compte.</div></div>';
     return;
   }
-  grid.innerHTML=allClients.map(c=>{
-    const initials=(c.nom||'?').split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase();
-    const ca=TIER_PRIX[c.tier]||0;
-    const caLabel=ca>0?ca+'€/mois':'Devis';
-    return`<div class="client-row-item" onclick="openClientDetail('${c.id}')">
+  grid.innerHTML = allClients.map(c => {
+    const initials = (c.name || '?').split(' ').map(n => n[0] || '').join('').slice(0, 2).toUpperCase();
+    const sub = allSubscriptions[c.id]?.[CURRENT_PRODUCT.key];
+    const planLabel = sub ? (sub.plan + ' · ' + (sub.seatsAllocated || 0) + ' sièges') : 'Pas d\'abonnement ' + CURRENT_PRODUCT.name;
+    const caLabel = sub ? ((TIER_PRIX[sub.plan] || 0) + '€/mois') : '—';
+    const status = c.status || 'active';
+    return `<div class="client-row-item" onclick="openClientDetail('${c.id}')">
       <div class="client-avatar">${initials}</div>
-      <div style="flex:1;"><div class="client-name">${c.nom||c.id}</div><div class="client-tier">${c.tier||'—'} · ${c.login_email||'—'}</div></div>
+      <div style="flex:1;">
+        <div class="client-name">${c.name || c.id}</div>
+        <div class="client-tier">${planLabel} · ${c.adminEmail || '—'}</div>
+      </div>
       <div class="client-mrr">${caLabel}</div>
-      <div class="client-statut-pill ${c.statut||'actif'}">${c.statut||'actif'}</div>
+      <div class="client-statut-pill ${status}">${status === 'active' ? 'actif' : 'suspendu'}</div>
       <span class="arrow">›</span>
     </div>`;
   }).join('');
 }
-// ── Fiche client ─────────────────────────────────────────────────────────────
-window.openClientDetail=function(clientId){
-  currentClientId=clientId;
+
+// ── Fiche client ──────────────────────────────────────────────────────────────
+window.openClientDetail = function (clientId) {
+  currentClientId = clientId;
   renderDetail();
   showView('detail');
 };
-function renderDetail(){
-  const c=allClients.find(x=>x.id===currentClientId);
-  if(!c){showView('list');return;}
-  document.getElementById('detail-nom').textContent=c.nom||c.id;
-  const sig=c.date_signature?new Date(c.date_signature).toLocaleDateString('fr-FR'):'—';
-  document.getElementById('detail-sub').textContent=(c.tier||'—')+' · '+(c.login_email||'—')+' · signé le '+sig;
-  const statutBtn=document.getElementById('detail-statut-btn');
-  if(c.statut==='actif'||!c.statut){
-    statutBtn.textContent='⏸ Suspendre';
-    statutBtn.className='btn btn-amber';
-  }else{
-    statutBtn.textContent='▶ Réactiver';
-    statutBtn.className='btn btn-green';
+
+function renderDetail() {
+  const c = allClients.find(x => x.id === currentClientId);
+  if (!c) { showView('list'); return; }
+
+  document.getElementById('detail-nom').textContent = c.name || c.id;
+  document.getElementById('detail-sub').textContent = (c.adminEmail || '—') + ' · ' + currentClientId;
+
+  const statutBtn = document.getElementById('detail-statut-btn');
+  if (c.status === 'active') {
+    statutBtn.textContent = '⏸ Suspendre';
+    statutBtn.className = 'btn btn-amber';
+  } else {
+    statutBtn.textContent = '▶ Réactiver';
+    statutBtn.className = 'btn btn-green';
   }
-  const clientLics=allLicences.filter(l=>l.client_id===currentClientId);
-  const actives=clientLics.filter(l=>l.statut==='active');
-  const pending=clientLics.filter(l=>l.statut==='disponible');
-  const total=c.licences_total||clientLics.length||0;
-  document.getElementById('d-lic-active').textContent=actives.length;
-  document.getElementById('d-lic-active-sub').textContent='sur '+total+' au total';
-  document.getElementById('d-lic-pending').textContent=pending.length;
-  document.getElementById('d-lic-total').textContent=clientLics.length;
-  const ca=TIER_PRIX[c.tier]||0;
-  document.getElementById('d-ca').textContent=ca>0?(ca+'€'):'—';
-  document.getElementById('d-ca-sub').textContent=c.tier?('Forfait '+c.tier):'—';
-  const sevOrder={active:0,disponible:1,revoquee:2};
-  const sorted=[...clientLics].sort((a,b)=>(sevOrder[a.statut]??9)-(sevOrder[b.statut]??9));
-  document.getElementById('d-lic-table-body').innerHTML=sorted.length===0
-    ?'<tr><td colspan="3" style="text-align:center;color:var(--text3);font-family:DM Sans,sans-serif;padding:20px;">Aucune licence générée</td></tr>'
-    :sorted.map(l=>{
-      const pillClass=l.statut==='active'?'active':l.statut==='disponible'?'disponible':'revoquee';
-      const pillLabel=l.statut==='active'?'Active':l.statut==='disponible'?'Disponible':'Révoquée';
-      return`<tr><td>${l.id}</td><td><span class="lic-pill ${pillClass}">${pillLabel}</span></td><td>${l.assigned_to||'—'}</td></tr>`;
+
+  // Current product subscription
+  const sub = allSubscriptions[currentClientId]?.[CURRENT_PRODUCT.key];
+  document.getElementById('d-seats-alloc').textContent = sub ? (sub.seatsAllocated || 0) : '—';
+  document.getElementById('d-seats-sub').textContent = CURRENT_PRODUCT.name;
+  document.getElementById('d-plan').textContent = sub ? (sub.plan || '—') : '—';
+  document.getElementById('d-plan-sub').textContent = sub ? ((TIER_PRIX[sub.plan] || 0) + '€/mois') : '—';
+  document.getElementById('d-statut').textContent = c.status === 'active' ? 'Actif' : 'Suspendu';
+  const created = c.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—';
+  document.getElementById('d-created-at').textContent = 'Depuis le ' + created;
+
+  // Subscriptions table (all products for this client)
+  const clientSubs = allSubscriptions[currentClientId] || {};
+  const rows = Object.values(clientSubs);
+  document.getElementById('d-sub-table-body').innerHTML = rows.length === 0
+    ? '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:20px;font-family:DM Sans,sans-serif;">Aucun abonnement</td></tr>'
+    : rows.map(s => {
+      const pillClass = s.status === 'active' ? 'active' : 'suspended';
+      return `<tr>
+        <td>${s.product || '—'}</td>
+        <td>${s.plan || '—'}</td>
+        <td>${s.seatsAllocated || 0}</td>
+        <td><span class="sub-pill ${pillClass}">${s.status || '—'}</span></td>
+      </tr>`;
     }).join('');
+
+  // Admin info
+  document.getElementById('d-admin-info').innerHTML =
+    `Email : <b>${c.adminEmail || '—'}</b><br>UID produit : ${c.adminUid || '<span style="color:var(--amber)">En attente de provisioning</span>'}`;
 }
-window.toggleStatutClient=async function(){
-  if(!currentClientId) return;
-  const c=allClients.find(x=>x.id===currentClientId);
-  if(!c) return;
-  const nouveauStatut=(c.statut==='actif'||!c.statut)?'suspendu':'actif';
-  try{
-    await updateDoc(doc(db,'clients',currentClientId),{statut:nouveauStatut});
-    toast('Statut mis à jour → '+nouveauStatut,'var(--green)');
-  }catch(e){toast('Erreur : '+e.message,'var(--red)');}
+
+// ── Toggle statut client ──────────────────────────────────────────────────────
+window.toggleStatutClient = async function () {
+  if (!currentClientId) return;
+  const c = allClients.find(x => x.id === currentClientId);
+  if (!c) return;
+  const newStatus = c.status === 'active' ? 'suspended' : 'active';
+  try {
+    await updateDoc(doc(visionDb, 'clients', currentClientId), {
+      status: newStatus,
+      updatedAt: serverTimestamp()
+    });
+    toast('Statut mis à jour → ' + newStatus, 'var(--green)');
+  } catch (e) { toast('Erreur : ' + e.message, 'var(--red)'); }
 };
-window.enterClientDashboard=function(){
-  if(!currentClientId) return;
-  const c=allClients.find(x=>x.id===currentClientId);
-  document.getElementById('intervention-label').textContent=(c?.nom||currentClientId)+' ('+currentClientId+')';
-  document.getElementById('intervention-iframe').src='https://dashboardmanager.malary.eu/index.html?client_id='+encodeURIComponent(currentClientId)+'&product='+CURRENT_PRODUCT.key;
+
+// ── Mode intervention ─────────────────────────────────────────────────────────
+window.enterClientDashboard = function () {
+  if (!currentClientId) return;
+  const c = allClients.find(x => x.id === currentClientId);
+  document.getElementById('intervention-label').textContent = (c?.name || currentClientId) + ' — ' + CURRENT_PRODUCT.name;
+  const dashBase = CURRENT_PRODUCT.dashUrl || 'https://dashboardmanager.malary.eu/index.html';
+  document.getElementById('intervention-iframe').src = dashBase + '?client_id=' + encodeURIComponent(currentClientId) + '&product=' + CURRENT_PRODUCT.key;
   showView('intervention');
 };
-// ── Création client ──────────────────────────────────────────────────────────
-function genererCodeLicence(){
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const seg=()=>Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
-  return CURRENT_PRODUCT.licPrefix+'-'+seg()+'-'+seg()+'-'+seg();
+
+// ── Création client ───────────────────────────────────────────────────────────
+function slugify(nom) {
+  return (nom || '').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'client';
 }
-function slugify(nom){
-  return(nom||'')
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9]+/g,'-')
-    .replace(/(^-|-$)/g,'')||'client';
-}
-window.prefillLicences=function(){
-  const tier=document.getElementById('cli-tier').value;
-  document.getElementById('cli-licences').value=TIER_DEFAULT_LICS[tier]||5;
+
+window.prefillSeats = function () {
+  const tier = document.getElementById('cli-tier').value;
+  document.getElementById('cli-seats').value = TIER_DEFAULT_SEATS[tier] || 5;
 };
-window.openCreateModal=function(){
-  document.getElementById('create-result').innerHTML='';
-  ['cli-nom','cli-email','cli-password','cli-contact-name','cli-contact-role','cli-contact-email','cli-contact-phone'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('cli-tier').value='1-5';
-  document.getElementById('cli-licences').value=5;
+
+window.openCreateModal = function () {
+  document.getElementById('create-result').innerHTML = '';
+  ['cli-nom', 'cli-email', 'cli-password', 'cli-admin-name'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('cli-tier').value = 'Starter';
+  document.getElementById('cli-seats').value = 5;
   document.getElementById('create-modal').classList.add('active');
 };
-window.closeCreateModal=function(){document.getElementById('create-modal').classList.remove('active');};
-window.createClient=async function(){
-  const nom=document.getElementById('cli-nom').value.trim();
-  const tier=document.getElementById('cli-tier').value;
-  const licencesTotal=parseInt(document.getElementById('cli-licences').value,10);
-  const email=document.getElementById('cli-email').value.trim();
-  const password=document.getElementById('cli-password').value.trim();
-  const contactName=document.getElementById('cli-contact-name').value.trim();
-  const contactRole=document.getElementById('cli-contact-role').value.trim();
-  const contactEmail=document.getElementById('cli-contact-email').value.trim();
-  const contactPhone=document.getElementById('cli-contact-phone').value.trim();
-  if(!nom||!email||!password||!contactName){toast('Nom du client, contact de référence, email admin et mot de passe requis','var(--red)');return;}
-  if(password.length<8){toast('Mot de passe : 8 caractères minimum','var(--red)');return;}
-  if(!licencesTotal||licencesTotal<1){toast('Nombre de licences invalide','var(--red)');return;}
-  const btn=document.getElementById('create-client-btn');
-  btn.disabled=true;btn.textContent='Création en cours…';
-  try{
-    let clientId=slugify(nom);
-    let suffix=0;
-    while(true){
-      const candidate=suffix===0?clientId:(clientId+'-'+suffix);
-      const existing=await getDoc(doc(db,'clients',candidate));
-      if(!existing.exists()){clientId=candidate;break;}
+window.closeCreateModal = function () {
+  document.getElementById('create-modal').classList.remove('active');
+};
+
+window.createClient = async function () {
+  const nom = document.getElementById('cli-nom').value.trim();
+  const tier = document.getElementById('cli-tier').value;
+  const seatsAllocated = parseInt(document.getElementById('cli-seats').value, 10);
+  const adminName = document.getElementById('cli-admin-name').value.trim();
+  const email = document.getElementById('cli-email').value.trim();
+  const password = document.getElementById('cli-password').value.trim();
+
+  if (!nom || !email || !password || !adminName) {
+    toast('Nom client, nom admin, email et mot de passe requis', 'var(--red)'); return;
+  }
+  if (password.length < 8) { toast('Mot de passe : 8 caractères minimum', 'var(--red)'); return; }
+  if (!seatsAllocated || seatsAllocated < 1) { toast('Nombre de sièges invalide', 'var(--red)'); return; }
+
+  const btn = document.getElementById('create-client-btn');
+  btn.disabled = true;
+  btn.textContent = 'Provisioning en cours…';
+
+  const steps = [];
+  let clientId = null;
+  let adminUid = null;
+
+  try {
+    // ── Étape 1 : slug unique ──────────────────────────────────────────────
+    btn.textContent = '1/6 — Vérification du slug…';
+    let baseSlug = slugify(nom);
+    let suffix = 0;
+    while (true) {
+      const candidate = suffix === 0 ? baseSlug : baseSlug + '-' + suffix;
+      const snap = await getDoc(doc(visionDb, 'clients', candidate));
+      if (!snap.exists()) { clientId = candidate; break; }
       suffix++;
     }
-    const cred=await createUser2(authSecondary,email,password);
-    await authSecondary.signOut();
-    await setDoc(doc(db,'clients',clientId),{
-      nom,tier,licences_total:licencesTotal,statut:'actif',
-      date_signature:new Date().toISOString(),
-      login_email:email,admin_uid:cred.user.uid,
-      contact_reference:{
-        nom:contactName,
-        fonction:contactRole||null,
-        email:contactEmail||null,
-        telephone:contactPhone||null
+    steps.push('✓ clientId = ' + clientId);
+
+    // ── Étape 2 : créer clients/{clientId} dans malary-identite ───────────
+    btn.textContent = '2/6 — Création client (control plane)…';
+    const now = serverTimestamp();
+    await setDoc(doc(visionDb, 'clients', clientId), {
+      name: nom,
+      slug: clientId,
+      status: 'active',
+      adminEmail: email,
+      adminUid: '', // filled after auth creation
+      createdAt: now,
+      updatedAt: now
+    });
+    steps.push('✓ clients/' + clientId + ' créé dans malary-identite');
+
+    // ── Étape 3 : créer subscription ──────────────────────────────────────
+    btn.textContent = '3/6 — Création abonnement…';
+    await setDoc(
+      doc(visionDb, 'clients', clientId, 'subscriptions', CURRENT_PRODUCT.key),
+      {
+        product: CURRENT_PRODUCT.key,
+        productProjectId: CURRENT_PRODUCT.projectId,
+        plan: tier,
+        seatsAllocated,
+        seatsUsed: 0,
+        status: 'active',
+        startDate: now,
+        createdAt: now,
+        updatedAt: now
       }
+    );
+    steps.push('✓ subscription ' + CURRENT_PRODUCT.key + ' · ' + tier + ' · ' + seatsAllocated + ' sièges');
+
+    // ── Étapes 4-6 : provisionClientAdmin — Cloud Function malary-identite ──
+    // Admin SDK côté serveur : bypasse les règles Firestore des projets produit.
+    // Idempotent : si le compte Auth existe déjà (email), il est réutilisé.
+    // La CF back-fille adminUid sur clients/{clientId} dans malary-identite.
+    btn.textContent = '4-6/6 — Provisionnement admin (Cloud Function)…';
+    const provisionCF = httpsCallable(visionFunctions, 'provisionClientAdmin');
+    const provisionResult = await provisionCF({
+      clientId,
+      product: CURRENT_PRODUCT.key,
+      productProjectId: CURRENT_PRODUCT.projectId,
+      adminEmail: email,
+      adminPassword: password,
+      adminDisplayName: adminName,
+      seatsAllocated,
+      plan: tier,
     });
-    const codes=await genererEtSauvegarderLicences(clientId,licencesTotal);
-    toast('Client "'+nom+'" créé avec '+licencesTotal+' licence(s)','var(--green)');
-    document.getElementById('create-result').innerHTML=buildLicencesResultHTML('Client créé — '+clientId,email,password,codes);
-    btn.textContent='+ Créer le client et générer les licences';
-    btn.disabled=false;
-  }catch(e){
-    toast('Erreur : '+e.message,'var(--red)');
-    btn.disabled=false;btn.textContent='+ Créer le client et générer les licences';
-  }
-};
-// ── Ajout de licences ────────────────────────────────────────────────────────
-window.openAddLicModal=function(){
-  document.getElementById('add-lic-result').innerHTML='';
-  document.getElementById('add-lic-count').value=5;
-  document.getElementById('add-lic-modal').classList.add('active');
-};
-window.closeAddLicModal=function(){document.getElementById('add-lic-modal').classList.remove('active');};
-window.addLicences=async function(){
-  if(!currentClientId) return;
-  const count=parseInt(document.getElementById('add-lic-count').value,10);
-  if(!count||count<1){toast('Nombre invalide','var(--red)');return;}
-  const btn=document.getElementById('add-lic-btn');
-  btn.disabled=true;btn.textContent='Génération…';
-  try{
-    const codes=await genererEtSauvegarderLicences(currentClientId,count);
-    const c=allClients.find(x=>x.id===currentClientId);
-    const ancienTotal=c?.licences_total||0;
-    await updateDoc(doc(db,'clients',currentClientId),{licences_total:ancienTotal+count});
-    toast(count+' licence(s) ajoutée(s)','var(--green)');
-    document.getElementById('add-lic-result').innerHTML=buildLicencesResultHTML('Licences générées',null,null,codes);
-  }catch(e){toast('Erreur : '+e.message,'var(--red)');}
-  btn.disabled=false;btn.textContent='+ Générer les licences';
-};
-async function genererEtSauvegarderLicences(clientId,count){
-  const codes=[];
-  for(let i=0;i<count;i++){
-    let code;
-    while(true){
-      code=genererCodeLicence();
-      const existing=await getDoc(doc(db,'licences',code));
-      if(!existing.exists()) break;
+    adminUid = provisionResult.data.adminUid;
+    const authReused = provisionResult.data.authReused;
+    const mirrorError = provisionResult.data.mirrorError;
+
+    steps.push('✓ Auth ' + (authReused ? 'réutilisé' : 'créé') + ' dans ' + CURRENT_PRODUCT.projectId +
+               ' (uid: ' + adminUid.slice(0, 8) + '…)');
+    steps.push('✓ users/' + adminUid.slice(0, 8) + '… créé dans ' + CURRENT_PRODUCT.projectId);
+    if (mirrorError) {
+      steps.push('⚠ entitlements/' + clientId + ' : synchronisation miroir à relancer (updateEntitlement)');
+    } else {
+      steps.push('✓ entitlements/' + clientId + ' créé dans ' + CURRENT_PRODUCT.projectId);
     }
-    await setDoc(doc(db,'licences',code),{
-      client_id:clientId,statut:'disponible',
-      assigned_to:null,date_creation:serverTimestamp(),date_activation:null
-    });
-    codes.push(code);
+
+    toast('Client "' + nom + '" provisionné avec succès', 'var(--green)');
+    document.getElementById('create-result').innerHTML = buildProvisioningResult(nom, clientId, email, password, adminUid, tier, seatsAllocated, steps);
+
+  } catch (e) {
+    // Rollback warning
+    const errMsg = e.code === 'auth/email-already-exists'
+      ? 'Ce compte email existe déjà dans ' + CURRENT_PRODUCT.key + '.'
+      : e.message;
+    toast('Erreur : ' + errMsg, 'var(--red)');
+    // Mark client as provisioning_incomplete if it was created
+    if (clientId) {
+      try {
+        await updateDoc(doc(visionDb, 'clients', clientId), {
+          status: 'provisioning_incomplete',
+          provisioningError: errMsg,
+          updatedAt: serverTimestamp()
+        });
+        steps.push('⚠ Client marqué provisioning_incomplete');
+      } catch (_) {}
+    }
+    document.getElementById('create-result').innerHTML =
+      '<div style="color:var(--red);font-size:12px;margin-top:10px;"><b>Erreur :</b> ' + errMsg + '<br><small>' + steps.join('<br>') + '</small></div>';
   }
-  return codes;
+
+  btn.disabled = false;
+  btn.textContent = 'Créer le client et provisionner l\'accès';
+};
+
+function buildProvisioningResult(nom, clientId, email, password, adminUid, tier, seats, steps) {
+  return `<div class="result-box">
+    <div class="result-title">✓ Client "${nom}" provisionné</div>
+    <div class="result-row">Client ID : <b>${clientId}</b></div>
+    <div class="result-row">Produit : <b>${CURRENT_PRODUCT.name}</b> · ${tier} · ${seats} sièges</div>
+    <div class="result-row" style="margin-top:8px;">Email admin : <b>${email}</b></div>
+    <div class="result-row">Mot de passe : <b style="font-family:DM Mono,monospace">${password}</b></div>
+    <div class="result-row">UID admin : ${adminUid.slice(0, 12)}…</div>
+    <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;font-size:10px;color:var(--text3);">
+      ${steps.map(s => '<div>' + s + '</div>').join('')}
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:var(--amber);">⚠ Communiquer les identifiants au client de manière sécurisée.</div>
+  </div>`;
 }
-function buildLicencesResultHTML(titre,email,password,codes){
-  // Lien du Dashboard Manager du client, avec le paramètre ?product= du Flow concerné toujours
-  // explicite (même pour FlowAlert, par défaut) — pour ne jamais envoyer par erreur un client
-  // sur le mauvais Flow (auquel cas la connexion échoue, le compte n'existant que sur ce Flow).
-  const dashUrl='https://dashboardmanager.malary.eu/?product='+CURRENT_PRODUCT.key;
-  return '<div class="result-box">'+
-    '<div class="result-title">✓ '+titre+'</div>'+
-    (email?'<div style="font-size:11px;color:var(--text2);margin-bottom:8px;">Identifiants : <b>'+email+'</b> / <span style="font-family:DM Mono,monospace">'+password+'</span></div>'+
-    '<div class="lic-code" style="margin-bottom:12px;"><span style="font-family:DM Mono,monospace;font-size:11px;">'+dashUrl+'</span><button class="copy-btn" onclick="navigator.clipboard.writeText(&quot;'+dashUrl+'&quot;).then(()=>this.textContent=\'✓\')">Copier</button></div>':'') +
-    '<div class="result-title">Codes de licence ('+codes.length+')</div>'+
-    '<div class="lic-codes">'+codes.map(c=>'<div class="lic-code"><span>'+c+'</span><button class="copy-btn" onclick="navigator.clipboard.writeText(&quot;'+c+'&quot;).then(()=>this.textContent=\'✓\')">Copier</button></div>').join('')+
-    '</div></div>';
-}
+
+// ── Modifier quota ─────────────────────────────────────────────────────────
+window.openModifyQuotaModal = function () {
+  if (!currentClientId) return;
+  const sub = allSubscriptions[currentClientId]?.[CURRENT_PRODUCT.key];
+  document.getElementById('mq-tier').value = sub?.plan || 'Starter';
+  document.getElementById('mq-seats').value = sub?.seatsAllocated || 5;
+  document.getElementById('modify-quota-modal').classList.add('active');
+};
+window.closeModifyQuotaModal = function () {
+  document.getElementById('modify-quota-modal').classList.remove('active');
+};
+
+window.saveQuota = async function () {
+  if (!currentClientId) return;
+  const plan = document.getElementById('mq-tier').value;
+  const seatsAllocated = parseInt(document.getElementById('mq-seats').value, 10);
+  if (!seatsAllocated || seatsAllocated < 1) { toast('Nombre de sièges invalide', 'var(--red)'); return; }
+
+  const btn = document.getElementById('mq-btn');
+  btn.disabled = true; btn.textContent = 'Enregistrement…';
+  try {
+    await updateDoc(
+      doc(visionDb, 'clients', currentClientId, 'subscriptions', CURRENT_PRODUCT.key),
+      { plan, seatsAllocated, updatedAt: serverTimestamp() }
+    );
+    toast('Quota mis à jour dans malary-identite. Déployer les Cloud Functions pour synchroniser ' + CURRENT_PRODUCT.key + '.', 'var(--amber)');
+    closeModifyQuotaModal();
+  } catch (e) { toast('Erreur : ' + e.message, 'var(--red)'); }
+  btn.disabled = false; btn.textContent = 'Enregistrer';
+};
 </script>
 </body>
-</html>
 </html>
