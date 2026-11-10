@@ -170,7 +170,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       </div>
       <div class="global-kpis">
         <div class="kpi-card" style="--accent:var(--green)"><div class="kpi-label">Clients actifs</div><div class="kpi-value" id="kpi-clients">—</div><div class="kpi-sub" id="kpi-clients-sub">—</div></div>
-        <div class="kpi-card" style="--accent:var(--or)"><div class="kpi-label">MRR</div><div class="kpi-value" id="kpi-mrr">—</div><div class="kpi-sub">€ / mois</div></div>
+        <div class="kpi-card" style="--accent:var(--or)"><div class="kpi-label">MRR</div><div class="kpi-value" id="kpi-mrr">—</div><div class="kpi-sub" id="kpi-mrr-sub">€ / mois</div></div>
         <div class="kpi-card" style="--accent:var(--blue)"><div class="kpi-label">Sièges alloués</div><div class="kpi-value" id="kpi-seats">—</div><div class="kpi-sub" id="kpi-seats-sub">—</div></div>
         <div class="kpi-card" style="--accent:var(--amber)"><div class="kpi-label">ARR estimé</div><div class="kpi-value" id="kpi-arr">—</div><div class="kpi-sub">€ / an</div></div>
       </div>
@@ -242,16 +242,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Plan *</label>
-          <select class="form-select" id="cli-tier" onchange="prefillSeats()">
-            <option value="Starter">Starter — 149€/mois</option>
-            <option value="Pro">Pro — 249€/mois</option>
-            <option value="Enterprise">Enterprise — sur devis</option>
-          </select>
+          <label class="form-label">Sièges (licences) *</label>
+          <input class="form-input" id="cli-seats" type="number" min="1" value="5" oninput="updateCreateTarif()">
         </div>
         <div class="form-group">
-          <label class="form-label">Sièges (licences) *</label>
-          <input class="form-input" id="cli-seats" type="number" min="1" value="5">
+          <label class="form-label">Tarif (grille site, selon licences)</label>
+          <div class="form-input" id="cli-tarif" style="display:flex;align-items:center;color:var(--text2);">—</div>
+        </div>
+      </div>
+      <div class="form-row" id="cli-custom-row" style="display:none;">
+        <div class="form-group full">
+          <label class="form-label">Tarif mensuel personnalisé HT (sur devis, 26 licences et +)</label>
+          <input class="form-input" id="cli-custom-price" type="number" min="0" step="1" placeholder="Montant négocié € HT/mois (vide si non chiffré)" oninput="updateCreateTarif()">
+          <div class="form-hint">Aucun montant par défaut : à renseigner uniquement si un tarif a été négocié.</div>
         </div>
       </div>
       <div class="section-sep"></div>
@@ -295,16 +298,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
     <div class="modal-body">
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Nouveau plan</label>
-          <select class="form-select" id="mq-tier">
-            <option value="Starter">Starter — 149€/mois</option>
-            <option value="Pro">Pro — 249€/mois</option>
-            <option value="Enterprise">Enterprise — sur devis</option>
-          </select>
+          <label class="form-label">Nombre de sièges</label>
+          <input class="form-input" id="mq-seats" type="number" min="1" value="5" oninput="updateQuotaTarif()">
         </div>
         <div class="form-group">
-          <label class="form-label">Nombre de sièges</label>
-          <input class="form-input" id="mq-seats" type="number" min="1" value="5">
+          <label class="form-label">Tarif (grille site, selon licences)</label>
+          <div class="form-input" id="mq-tarif" style="display:flex;align-items:center;color:var(--text2);">—</div>
+        </div>
+      </div>
+      <div class="form-row" id="mq-custom-row" style="display:none;">
+        <div class="form-group full">
+          <label class="form-label">Tarif mensuel personnalisé HT (sur devis, 26 licences et +)</label>
+          <input class="form-input" id="mq-custom-price" type="number" min="0" step="1" placeholder="Montant négocié € HT/mois (vide si non chiffré)" oninput="updateQuotaTarif()">
         </div>
       </div>
       <div class="form-hint" style="margin-bottom:12px;">Note : la mise à jour de l'entitlement dans le projet produit nécessite les Cloud Functions Malary (activation Blaze requise). Le control plane malary-identite sera mis à jour immédiatement.</div>
@@ -403,8 +408,37 @@ const PRODUCTS = {
   }
 };
 
-const TIER_PRIX = { Starter: 149, Pro: 249, Enterprise: 0 };
+const TIER_PRIX = { Starter: 149, Pro: 249, Enterprise: 0 }; // LEGACY (modal "modifier quota" non traité)
 const TIER_DEFAULT_SEATS = { Starter: 5, Pro: 15, Enterprise: 30 };
+// Grille tarifaire = celle PUBLIÉE sur malary.eu (#tarifs), confirmée dans
+// docs/ouverture-publique.md. Le prix dépend du NOMBRE DE LICENCES (sièges),
+// PAS du produit : la grille est identique pour les 6 applications.
+const SEAT_TIERS = [
+  { code: '1-5',   min: 1,  max: 5,  price: 149,  label: '1 à 5 licences' },
+  { code: '6-10',  min: 6,  max: 10, price: 249,  label: '6 à 10 licences' },
+  { code: '11-15', min: 11, max: 15, price: 349,  label: '11 à 15 licences' },
+  { code: '16-25', min: 16, max: 25, price: 549,  label: '16 à 25 licences' },
+  { code: '26+',   min: 26, max: Number.MAX_SAFE_INTEGER, price: null, label: '26 licences et plus (sur devis)' },
+];
+function tierForSeats(n) { const s = parseInt(n, 10) || 0; return SEAT_TIERS.find(t => s >= t.min && s <= t.max) || SEAT_TIERS[0]; }
+// Prix mensuel HT effectif d'un abonnement + type. Fidèle au site : prix = f(licences),
+// SAUF démo (gratuit, jamais facturé) ou tarif contractuel négocié (sur devis renseigné).
+function subMonthly(sub) {
+  if (!sub) return { amount: null, kind: 'none' };
+  if (sub.plan === 'demo') return { amount: 0, kind: 'demo' };
+  const custom = sub.customMonthlyPrice;
+  if (custom !== undefined && custom !== null && custom !== '') return { amount: Number(custom), kind: 'custom' };
+  const t = tierForSeats(sub.seatsAllocated);
+  if (t.price == null) return { amount: null, kind: 'devis' };
+  return { amount: t.price, kind: 'tier' };
+}
+function subMonthlyLabel(sub) {
+  const m = subMonthly(sub);
+  if (m.kind === 'none') return '—';
+  if (m.kind === 'demo') return 'Démo (gratuit)';
+  if (m.kind === 'devis') return 'Sur devis (à renseigner)';
+  return m.amount + '€/mois' + (m.kind === 'custom' ? ' (négocié)' : '');
+}
 
 const urlParams = new URLSearchParams(window.location.search);
 const CURRENT_PRODUCT = PRODUCTS[urlParams.get('product')] || PRODUCTS.flowalert;
@@ -520,37 +554,41 @@ window.showView = function (view) {
 
 // ── Render liste ─────────────────────────────────────────────────────────────
 function renderList() {
-  const actifs = allClients.filter(c => c.status === 'active');
+  // Fix: ne lister que les clients RATTACHÉS au produit sélectionné (abonnement présent).
+  const scoped = allClients.filter(c => allSubscriptions[c.id]?.[CURRENT_PRODUCT.key]);
+  const actifs = scoped.filter(c => c.status === 'active');
   // MRR from subscriptions of current product
-  let mrr = 0, totalSeats = 0;
+  let mrr = 0, totalSeats = 0, devisSansTarif = 0;
   Object.values(allSubscriptions).forEach(subs => {
     const sub = subs[CURRENT_PRODUCT.key];
     if (sub && sub.status === 'active') {
-      mrr += TIER_PRIX[sub.plan] || 0;
+      const m = subMonthly(sub);
+      if (m.kind === 'devis') devisSansTarif += 1; else mrr += (m.amount || 0);
       totalSeats += sub.seatsAllocated || 0;
     }
   });
   const arr = mrr * 12;
 
   document.getElementById('list-title').textContent = CURRENT_PRODUCT.name + ' — Clients';
-  document.getElementById('list-sub').textContent = actifs.length + ' client(s) actif(s) sur ' + allClients.length;
+  document.getElementById('list-sub').textContent = actifs.length + ' client(s) actif(s) sur ' + scoped.length;
   document.getElementById('kpi-clients').textContent = actifs.length;
-  document.getElementById('kpi-clients-sub').textContent = allClients.length + ' au total';
+  document.getElementById('kpi-clients-sub').textContent = scoped.length + ' au total';
   document.getElementById('kpi-mrr').textContent = mrr + '€';
+  document.getElementById('kpi-mrr-sub').textContent = devisSansTarif > 0 ? ('€/mois · ' + devisSansTarif + ' sur devis à chiffrer') : '€ / mois';
   document.getElementById('kpi-seats').textContent = totalSeats;
   document.getElementById('kpi-seats-sub').textContent = CURRENT_PRODUCT.name;
   document.getElementById('kpi-arr').textContent = arr + '€';
 
   const grid = document.getElementById('clients-list');
-  if (allClients.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="ico">🏢</div><div>Aucun client</div><div style="font-size:10px;">Cliquez sur "+ Nouveau client" pour créer le premier compte.</div></div>';
+  if (scoped.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="ico">🏢</div><div>Aucun client ' + CURRENT_PRODUCT.name + '</div><div style="font-size:10px;">Aucun client rattaché à ce produit.</div></div>';
     return;
   }
-  grid.innerHTML = allClients.map(c => {
+  grid.innerHTML = scoped.map(c => {
     const initials = (c.name || '?').split(' ').map(n => n[0] || '').join('').slice(0, 2).toUpperCase();
     const sub = allSubscriptions[c.id]?.[CURRENT_PRODUCT.key];
     const planLabel = sub ? (sub.plan + ' · ' + (sub.seatsAllocated || 0) + ' sièges') : 'Pas d\'abonnement ' + CURRENT_PRODUCT.name;
-    const caLabel = sub ? ((TIER_PRIX[sub.plan] || 0) + '€/mois') : '—';
+    const caLabel = sub ? subMonthlyLabel(sub) : '—';
     const status = c.status || 'active';
     return `<div class="client-row-item" onclick="openClientDetail('${c.id}')">
       <div class="client-avatar">${initials}</div>
@@ -593,7 +631,7 @@ function renderDetail() {
   document.getElementById('d-seats-alloc').textContent = sub ? (sub.seatsAllocated || 0) : '—';
   document.getElementById('d-seats-sub').textContent = CURRENT_PRODUCT.name;
   document.getElementById('d-plan').textContent = sub ? (sub.plan || '—') : '—';
-  document.getElementById('d-plan-sub').textContent = sub ? ((TIER_PRIX[sub.plan] || 0) + '€/mois') : '—';
+  document.getElementById('d-plan-sub').textContent = sub ? subMonthlyLabel(sub) : '—';
   document.getElementById('d-statut').textContent = c.status === 'active' ? 'Actif' : 'Suspendu';
   const created = c.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—';
   document.getElementById('d-created-at').textContent = 'Depuis le ' + created;
@@ -650,9 +688,26 @@ function slugify(nom) {
     .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'client';
 }
 
-window.prefillSeats = function () {
-  const tier = document.getElementById('cli-tier').value;
-  document.getElementById('cli-seats').value = TIER_DEFAULT_SEATS[tier] || 5;
+window.updateCreateTarif = function () {
+  const t = tierForSeats(document.getElementById('cli-seats').value);
+  const isDevis = t.price == null;
+  document.getElementById('cli-custom-row').style.display = isDevis ? '' : 'none';
+  const custom = document.getElementById('cli-custom-price').value;
+  document.getElementById('cli-tarif').textContent = isDevis
+    ? (t.label + ' · ' + (custom !== '' ? Number(custom) + '€ HT/mois (négocié)' : 'sur devis — tarif à renseigner'))
+    : (t.label + ' · ' + t.price + '€ HT/mois');
+};
+window.updateQuotaTarif = function () {
+  const el = document.getElementById('mq-tarif'); if (!el) return;
+  const t = tierForSeats(document.getElementById('mq-seats').value);
+  const isDevis = t.price == null;
+  const row = document.getElementById('mq-custom-row'); if (row) row.style.display = isDevis ? '' : 'none';
+  const sub = currentClientId ? allSubscriptions[currentClientId]?.[CURRENT_PRODUCT.key] : null;
+  if (sub && sub.plan === 'demo') { el.textContent = 'Démo (gratuit) — non facturé'; return; }
+  const custom = document.getElementById('mq-custom-price')?.value || '';
+  el.textContent = isDevis
+    ? (t.label + ' · ' + (custom !== '' ? Number(custom) + '€ HT/mois (négocié)' : 'sur devis — tarif à renseigner'))
+    : (t.label + ' · ' + t.price + '€ HT/mois');
 };
 
 window.openCreateModal = function () {
@@ -660,8 +715,8 @@ window.openCreateModal = function () {
   ['cli-nom', 'cli-email', 'cli-password', 'cli-admin-name'].forEach(id => {
     document.getElementById(id).value = '';
   });
-  document.getElementById('cli-tier').value = 'Starter';
   document.getElementById('cli-seats').value = 5;
+  updateCreateTarif();
   document.getElementById('create-modal').classList.add('active');
 };
 window.closeCreateModal = function () {
@@ -670,8 +725,11 @@ window.closeCreateModal = function () {
 
 window.createClient = async function () {
   const nom = document.getElementById('cli-nom').value.trim();
-  const tier = document.getElementById('cli-tier').value;
   const seatsAllocated = parseInt(document.getElementById('cli-seats').value, 10);
+  const tierObj = tierForSeats(seatsAllocated);
+  const tier = tierObj.code; // plan = tranche de licences (grille site)
+  const cliCustomRaw = document.getElementById('cli-custom-price').value.trim();
+  const customMonthlyPrice = (tierObj.price == null && cliCustomRaw !== '') ? Number(cliCustomRaw) : null;
   const adminName = document.getElementById('cli-admin-name').value.trim();
   const email = document.getElementById('cli-email').value.trim();
   const password = document.getElementById('cli-password').value.trim();
@@ -727,6 +785,7 @@ window.createClient = async function () {
         plan: tier,
         seatsAllocated,
         seatsUsed: 0,
+        ...(customMonthlyPrice != null ? { customMonthlyPrice } : {}),
         status: 'active',
         startDate: now,
         createdAt: now,
@@ -811,8 +870,10 @@ function buildProvisioningResult(nom, clientId, email, password, adminUid, tier,
 window.openModifyQuotaModal = function () {
   if (!currentClientId) return;
   const sub = allSubscriptions[currentClientId]?.[CURRENT_PRODUCT.key];
-  document.getElementById('mq-tier').value = sub?.plan || 'Starter';
   document.getElementById('mq-seats').value = sub?.seatsAllocated || 5;
+  const cp = document.getElementById('mq-custom-price');
+  if (cp) cp.value = (sub && sub.customMonthlyPrice != null) ? sub.customMonthlyPrice : '';
+  updateQuotaTarif();
   document.getElementById('modify-quota-modal').classList.add('active');
 };
 window.closeModifyQuotaModal = function () {
@@ -821,16 +882,23 @@ window.closeModifyQuotaModal = function () {
 
 window.saveQuota = async function () {
   if (!currentClientId) return;
-  const plan = document.getElementById('mq-tier').value;
+  const sub = allSubscriptions[currentClientId]?.[CURRENT_PRODUCT.key];
   const seatsAllocated = parseInt(document.getElementById('mq-seats').value, 10);
   if (!seatsAllocated || seatsAllocated < 1) { toast('Nombre de sièges invalide', 'var(--red)'); return; }
+  const tierObj = tierForSeats(seatsAllocated);
+  // Démo : ne JAMAIS transformer un abonnement démo gratuit en abonnement facturé.
+  const isDemo = sub && sub.plan === 'demo';
+  const plan = isDemo ? 'demo' : tierObj.code;
+  const mqCustomRaw = (document.getElementById('mq-custom-price')?.value || '').trim();
+  const payload = { plan, seatsAllocated, updatedAt: serverTimestamp() };
+  if (!isDemo && tierObj.price == null && mqCustomRaw !== '') payload.customMonthlyPrice = Number(mqCustomRaw);
 
   const btn = document.getElementById('mq-btn');
   btn.disabled = true; btn.textContent = 'Enregistrement…';
   try {
     await updateDoc(
       doc(visionDb, 'clients', currentClientId, 'subscriptions', CURRENT_PRODUCT.key),
-      { plan, seatsAllocated, updatedAt: serverTimestamp() }
+      payload
     );
     toast('Quota mis à jour dans malary-identite. Déployer les Cloud Functions pour synchroniser ' + CURRENT_PRODUCT.key + '.', 'var(--amber)');
     closeModifyQuotaModal();
