@@ -117,6 +117,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .intervention-iframe{flex:1;width:100%;border:none;background:var(--bg);}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--bg4);border:1px solid var(--or-border);border-radius:7px;padding:9px 14px;font-size:11px;color:var(--text);z-index:1000;display:none;max-width:360px;}
 .section-sep{height:1px;background:var(--border);margin:4px 0;}
+.scope-switch{display:flex;gap:3px;background:var(--bg2);border:1px solid var(--border2);border-radius:99px;padding:3px;}
+.scope-tab{font-size:11px;padding:5px 14px;border-radius:99px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .15s;white-space:nowrap;}
+.scope-tab:hover{color:var(--text);}
+.scope-tab.active{background:var(--or);color:#07080a;}
+.prod-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
+.prod-badge{font-size:9px;padding:2px 7px;border-radius:99px;font-family:'DM Mono',monospace;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(96,165,250,.25);}
+.prod-badge.none{background:var(--amber-bg);color:var(--amber);border-color:rgba(251,191,36,.25);}
 </style>
 </head>
 <body>
@@ -165,6 +172,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
         <div>
           <div class="view-title" id="list-title">Clients</div>
           <div class="view-sub" id="list-sub">Chargement…</div>
+        </div>
+        <div class="scope-switch">
+          <button class="scope-tab active" id="scope-product" onclick="setScope('product')">Clients de ce produit</button>
+          <button class="scope-tab" id="scope-all" onclick="setScope('all')">Tous les clients</button>
         </div>
         <button class="btn btn-or" onclick="openCreateModal()">+ Nouveau client</button>
       </div>
@@ -442,6 +453,10 @@ function subMonthlyLabel(sub) {
 
 const urlParams = new URLSearchParams(window.location.search);
 const CURRENT_PRODUCT = PRODUCTS[urlParams.get('product')] || PRODUCTS.flowalert;
+// Portée de la liste : 'product' (filtrée par abonnement du produit — défaut) ou
+// 'all' (tous les clients, avec leurs produits réels). Conservée dans l'URL pour
+// rester active en changeant d'onglet produit.
+let currentScope = (urlParams.get('scope') === 'all') ? 'all' : 'product';
 
 // ── Firebase app instances ──────────────────────────────────────────────────
 // Vision core: always malary-identite
@@ -453,15 +468,40 @@ const visionFunctions = getFunctions(visionApp, 'europe-west1');
 
 // ── State ───────────────────────────────────────────────────────────────────
 let allClients = [];
-let allSubscriptions = {}; // { clientId: { [product]: {...} } }
+let allSubscriptions = {}; // { clientId: { [product]: {...} } } — produit courant (requête filtrée, vue produit + KPIs)
+let allSubsByClient = {};  // { clientId: { [product=docId]: {...} } } — TOUS produits (vue « Tous les clients » + table fiche)
 let currentClientId = null;
 let unsubClients = null;
 let unsubSubs = null;
+let unsubSubsAll = null;
 
 // ── Product switch ──────────────────────────────────────────────────────────
-document.getElementById('product-switch').innerHTML = Object.values(PRODUCTS)
-  .map(p => `<a class="product-tab${p.key === CURRENT_PRODUCT.key ? ' active' : ''}" href="?product=${p.key}">${p.name}</a>`)
-  .join('');
+// Les onglets conservent la portée courante (scope) pour que « Tous les clients »
+// reste accessible depuis chacun des six onglets.
+function renderProductSwitch() {
+  const scopeQS = currentScope === 'all' ? '&scope=all' : '';
+  document.getElementById('product-switch').innerHTML = Object.values(PRODUCTS)
+    .map(p => `<a class="product-tab${p.key === CURRENT_PRODUCT.key ? ' active' : ''}" href="?product=${p.key}${scopeQS}">${p.name}</a>`)
+    .join('');
+}
+renderProductSwitch();
+
+// ── Scope switch (Tous les clients / Clients de ce produit) ───────────────────
+function renderScopeSwitch() {
+  document.getElementById('scope-product').classList.toggle('active', currentScope === 'product');
+  document.getElementById('scope-all').classList.toggle('active', currentScope === 'all');
+}
+renderScopeSwitch();
+window.setScope = function (scope) {
+  currentScope = (scope === 'all') ? 'all' : 'product';
+  // Refléter dans l'URL sans recharger (conserve le choix en changeant d'onglet).
+  const u = new URL(window.location.href);
+  if (currentScope === 'all') u.searchParams.set('scope', 'all'); else u.searchParams.delete('scope');
+  history.replaceState(null, '', u);
+  renderProductSwitch();
+  renderScopeSwitch();
+  renderList();
+};
 
 // ── Clock ───────────────────────────────────────────────────────────────────
 setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString('fr-FR'); }, 1000);
@@ -500,6 +540,7 @@ window.doLogin = async function () {
 window.doLogout = async function () {
   if (unsubClients) unsubClients();
   if (unsubSubs) unsubSubs();
+  if (unsubSubsAll) unsubSubsAll();
   await signOut(visionAuth);
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
@@ -531,6 +572,24 @@ function startListeners() {
     renderList();
     if (currentClientId) renderDetail();
   }, e => toast('Erreur abonnements : ' + e.message, 'var(--red)'));
+
+  // Toutes les souscriptions (tous produits) — pour la vue « Tous les clients »
+  // et la liste réelle des produits par client. Lecture seule. Le produit d'un
+  // abonnement = son doc ID (clé canonique du chemin clients/{id}/subscriptions/{produit}),
+  // avec repli sur le champ `product`. On ne rattache donc jamais un client à un
+  // produit dont il n'a pas le document d'abonnement.
+  unsubSubsAll = onSnapshot(collectionGroup(visionDb, 'subscriptions'), snap => {
+    allSubsByClient = {};
+    snap.docs.forEach(d => {
+      const clientId = d.ref.parent.parent.id;
+      const data = d.data();
+      const product = d.id || data.product; // doc ID = produit
+      if (!allSubsByClient[clientId]) allSubsByClient[clientId] = {};
+      allSubsByClient[clientId][product] = { id: d.id, ...data, product };
+    });
+    renderList();
+    if (currentClientId) renderDetail();
+  }, e => toast('Erreur (tous abonnements) : ' + e.message, 'var(--red)'));
 }
 
 // ── Navigation ───────────────────────────────────────────────────────────────
@@ -554,10 +613,10 @@ window.showView = function (view) {
 
 // ── Render liste ─────────────────────────────────────────────────────────────
 function renderList() {
-  // Fix: ne lister que les clients RATTACHÉS au produit sélectionné (abonnement présent).
+  // ── KPIs : TOUJOURS rattachés au produit sélectionné (identiques dans les deux
+  // vues), basés sur la requête filtrée existante (allSubscriptions). Inchangé.
   const scoped = allClients.filter(c => allSubscriptions[c.id]?.[CURRENT_PRODUCT.key]);
   const actifs = scoped.filter(c => c.status === 'active');
-  // MRR from subscriptions of current product
   let mrr = 0, totalSeats = 0, devisSansTarif = 0;
   Object.values(allSubscriptions).forEach(subs => {
     const sub = subs[CURRENT_PRODUCT.key];
@@ -568,11 +627,8 @@ function renderList() {
     }
   });
   const arr = mrr * 12;
-
-  document.getElementById('list-title').textContent = CURRENT_PRODUCT.name + ' — Clients';
-  document.getElementById('list-sub').textContent = actifs.length + ' client(s) actif(s) sur ' + scoped.length;
   document.getElementById('kpi-clients').textContent = actifs.length;
-  document.getElementById('kpi-clients-sub').textContent = scoped.length + ' au total';
+  document.getElementById('kpi-clients-sub').textContent = scoped.length + ' · ' + CURRENT_PRODUCT.name;
   document.getElementById('kpi-mrr').textContent = mrr + '€';
   document.getElementById('kpi-mrr-sub').textContent = devisSansTarif > 0 ? ('€/mois · ' + devisSansTarif + ' sur devis à chiffrer') : '€ / mois';
   document.getElementById('kpi-seats').textContent = totalSeats;
@@ -580,6 +636,45 @@ function renderList() {
   document.getElementById('kpi-arr').textContent = arr + '€';
 
   const grid = document.getElementById('clients-list');
+
+  if (currentScope === 'all') {
+    // ── Vue « Tous les clients » ────────────────────────────────────────────
+    // Tous les clients du registre, avec leurs produits réels (abonnements
+    // réellement présents). Les KPI ci-dessus restent ceux du produit sélectionné.
+    const actifsAll = allClients.filter(c => c.status === 'active').length;
+    document.getElementById('list-title').textContent = 'Tous les clients';
+    document.getElementById('list-sub').textContent =
+      allClients.length + ' client(s) · ' + actifsAll + ' actif(s) — KPI ci-dessus : ' + CURRENT_PRODUCT.name;
+    if (allClients.length === 0) {
+      grid.innerHTML = '<div class="empty-state"><div class="ico">🏢</div><div>Aucun client</div></div>';
+      return;
+    }
+    const sortedClients = allClients.slice().sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
+    grid.innerHTML = sortedClients.map(c => {
+      const initials = (c.name || '?').split(' ').map(n => n[0] || '').join('').slice(0, 2).toUpperCase();
+      const prods = Object.keys(allSubsByClient[c.id] || {}).sort();
+      const badges = prods.length
+        ? prods.map(p => `<span class="prod-badge">${PRODUCTS[p]?.name || p}</span>`).join('')
+        : '<span class="prod-badge none">Aucun produit</span>';
+      const status = c.status || 'active';
+      const statusLabel = status === 'active' ? 'actif' : (status === 'suspended' ? 'suspendu' : status);
+      return `<div class="client-row-item" onclick="openClientDetail('${c.id}')">
+        <div class="client-avatar">${initials}</div>
+        <div style="flex:1;">
+          <div class="client-name">${c.name || c.id}</div>
+          <div class="prod-badges">${badges}</div>
+        </div>
+        <div class="client-mrr">${c.adminEmail || '—'}</div>
+        <div class="client-statut-pill ${status}">${statusLabel}</div>
+        <span class="arrow">›</span>
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  // ── Vue « Clients de ce produit » (comportement existant, inchangé) ────────
+  document.getElementById('list-title').textContent = CURRENT_PRODUCT.name + ' — Clients';
+  document.getElementById('list-sub').textContent = actifs.length + ' client(s) actif(s) sur ' + scoped.length;
   if (scoped.length === 0) {
     grid.innerHTML = '<div class="empty-state"><div class="ico">🏢</div><div>Aucun client ' + CURRENT_PRODUCT.name + '</div><div style="font-size:10px;">Aucun client rattaché à ce produit.</div></div>';
     return;
@@ -626,25 +721,32 @@ function renderDetail() {
     statutBtn.className = 'btn btn-green';
   }
 
-  // Current product subscription
+  // Current product subscription — les métriques du haut restent rattachées au
+  // produit sélectionné. Si le client n'y est pas abonné, on l'indique clairement
+  // (jamais présenté comme abonné) et on masque « Modifier le quota ».
   const sub = allSubscriptions[currentClientId]?.[CURRENT_PRODUCT.key];
   document.getElementById('d-seats-alloc').textContent = sub ? (sub.seatsAllocated || 0) : '—';
   document.getElementById('d-seats-sub').textContent = CURRENT_PRODUCT.name;
   document.getElementById('d-plan').textContent = sub ? (sub.plan || '—') : '—';
-  document.getElementById('d-plan-sub').textContent = sub ? subMonthlyLabel(sub) : '—';
+  document.getElementById('d-plan-sub').textContent = sub ? subMonthlyLabel(sub) : ('Non abonné à ' + CURRENT_PRODUCT.name);
+  const mqBtn = document.getElementById('modify-quota-btn');
+  if (mqBtn) mqBtn.style.display = sub ? '' : 'none';
   document.getElementById('d-statut').textContent = c.status === 'active' ? 'Actif' : 'Suspendu';
   const created = c.createdAt?.toDate?.()?.toLocaleDateString('fr-FR') || '—';
   document.getElementById('d-created-at').textContent = 'Depuis le ' + created;
 
-  // Subscriptions table (all products for this client)
-  const clientSubs = allSubscriptions[currentClientId] || {};
-  const rows = Object.values(clientSubs);
+  // Subscriptions table — TOUS les produits réellement abonnés par ce client
+  // (map non filtrée, clé = produit du chemin d'abonnement). Jamais de produit
+  // auquel le client n'est pas rattaché.
+  const clientSubs = allSubsByClient[currentClientId] || {};
+  const rows = Object.keys(clientSubs).sort().map(p => clientSubs[p]);
   document.getElementById('d-sub-table-body').innerHTML = rows.length === 0
     ? '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:20px;font-family:DM Sans,sans-serif;">Aucun abonnement</td></tr>'
     : rows.map(s => {
       const pillClass = s.status === 'active' ? 'active' : 'suspended';
+      const prodName = PRODUCTS[s.product]?.name || s.product || '—';
       return `<tr>
-        <td>${s.product || '—'}</td>
+        <td>${prodName}</td>
         <td>${s.plan || '—'}</td>
         <td>${s.seatsAllocated || 0}</td>
         <td><span class="sub-pill ${pillClass}">${s.status || '—'}</span></td>
