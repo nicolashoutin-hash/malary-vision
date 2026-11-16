@@ -124,6 +124,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .prod-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
 .prod-badge{font-size:9px;padding:2px 7px;border-radius:99px;font-family:'DM Mono',monospace;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(96,165,250,.25);}
 .prod-badge.none{background:var(--amber-bg);color:var(--amber);border-color:rgba(251,191,36,.25);}
+.prod-badge.load{background:var(--bg4);color:var(--text3);border-color:var(--border2);}
+.prod-badge.err{background:var(--red-bg);color:var(--red);border-color:rgba(248,113,113,.3);}
 </style>
 </head>
 <body>
@@ -468,12 +470,13 @@ const visionFunctions = getFunctions(visionApp, 'europe-west1');
 
 // ── State ───────────────────────────────────────────────────────────────────
 let allClients = [];
-let allSubscriptions = {}; // { clientId: { [product]: {...} } } — produit courant (requête filtrée, vue produit + KPIs)
-let allSubsByClient = {};  // { clientId: { [product=docId]: {...} } } — TOUS produits (vue « Tous les clients » + table fiche)
+// Source unique des abonnements : lue par SOUS-COLLECTION clients/{id}/subscriptions
+// (les requêtes collectionGroup sont refusées par les règles — voir syncSubscriptionListeners).
+let allSubsByClient = {}; // { clientId: { [product=docId]: {...} } } — tous produits réels
+let subLoadState = {};    // { clientId: 'loading' | 'loaded' | 'error' } — distingue chargement / erreur / absence
 let currentClientId = null;
 let unsubClients = null;
-let unsubSubs = null;
-let unsubSubsAll = null;
+let subUnsubs = {};       // { clientId: unsubscribe } — un listener par sous-collection subscriptions
 
 // ── Product switch ──────────────────────────────────────────────────────────
 // Les onglets conservent la portée courante (scope) pour que « Tous les clients »
@@ -539,8 +542,8 @@ window.doLogin = async function () {
 
 window.doLogout = async function () {
   if (unsubClients) unsubClients();
-  if (unsubSubs) unsubSubs();
-  if (unsubSubsAll) unsubSubsAll();
+  Object.values(subUnsubs).forEach(u => u());
+  subUnsubs = {}; allSubsByClient = {}; subLoadState = {};
   await signOut(visionAuth);
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
@@ -549,47 +552,55 @@ window.doLogout = async function () {
 
 // ── Listeners (malary-identite only) ────────────────────────────────────────
 function startListeners() {
-  // All clients
+  // Registre des clients. À chaque mise à jour, on (dé)abonne les sous-collections.
   unsubClients = onSnapshot(collection(visionDb, 'clients'), snap => {
     allClients = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    syncSubscriptionListeners();
     renderList();
     if (currentClientId) renderDetail();
   }, e => toast('Erreur clients : ' + e.message, 'var(--red)'));
+}
 
-  // All subscriptions for the current product (collection group query)
-  const subsQuery = query(
-    collectionGroup(visionDb, 'subscriptions'),
-    where('product', '==', CURRENT_PRODUCT.key)
-  );
-  unsubSubs = onSnapshot(subsQuery, snap => {
-    allSubscriptions = {};
-    snap.docs.forEach(d => {
-      // Path: clients/{clientId}/subscriptions/{product}
-      const clientId = d.ref.parent.parent.id;
-      if (!allSubscriptions[clientId]) allSubscriptions[clientId] = {};
-      allSubscriptions[clientId][d.id] = { id: d.id, ...d.data() };
-    });
-    renderList();
-    if (currentClientId) renderDetail();
-  }, e => toast('Erreur abonnements : ' + e.message, 'var(--red)'));
-
-  // Toutes les souscriptions (tous produits) — pour la vue « Tous les clients »
-  // et la liste réelle des produits par client. Lecture seule. Le produit d'un
-  // abonnement = son doc ID (clé canonique du chemin clients/{id}/subscriptions/{produit}),
-  // avec repli sur le champ `product`. On ne rattache donc jamais un client à un
-  // produit dont il n'a pas le document d'abonnement.
-  unsubSubsAll = onSnapshot(collectionGroup(visionDb, 'subscriptions'), snap => {
-    allSubsByClient = {};
-    snap.docs.forEach(d => {
-      const clientId = d.ref.parent.parent.id;
-      const data = d.data();
-      const product = d.id || data.product; // doc ID = produit
-      if (!allSubsByClient[clientId]) allSubsByClient[clientId] = {};
-      allSubsByClient[clientId][product] = { id: d.id, ...data, product };
-    });
-    renderList();
-    if (currentClientId) renderDetail();
-  }, e => toast('Erreur (tous abonnements) : ' + e.message, 'var(--red)'));
+// Abonnements lus par SOUS-COLLECTION clients/{id}/subscriptions (un listener par
+// client). Les requêtes collectionGroup('subscriptions') sont refusées par les
+// règles : le match est imbriqué (clients/{id}/subscriptions/{product}) sans
+// `match /{path=**}/subscriptions/{...}`, ce qui n'autorise pas les collection
+// group queries (403). La lecture directe de la sous-collection, elle, est
+// autorisée (allow read: if isMalaryAdmin()). Lecture seule, aucune écriture.
+// subLoadState distingue 'loading' / 'loaded' / 'error' : « Aucun produit » n'est
+// affiché qu'après un snapshot RÉUSSI confirmant l'absence d'abonnement.
+function syncSubscriptionListeners() {
+  const ids = new Set(allClients.map(c => c.id));
+  // Retirer les listeners des clients disparus.
+  Object.keys(subUnsubs).forEach(id => {
+    if (!ids.has(id)) { subUnsubs[id](); delete subUnsubs[id]; delete allSubsByClient[id]; delete subLoadState[id]; }
+  });
+  // Ajouter un listener pour chaque nouveau client.
+  allClients.forEach(c => {
+    if (subUnsubs[c.id]) return;
+    subLoadState[c.id] = 'loading';
+    subUnsubs[c.id] = onSnapshot(
+      collection(visionDb, 'clients', c.id, 'subscriptions'),
+      snap => {
+        const m = {};
+        snap.docs.forEach(d => {
+          const data = d.data();
+          const product = d.id || data.product; // doc ID = produit (clé canonique du chemin)
+          m[product] = { id: d.id, ...data, product };
+        });
+        allSubsByClient[c.id] = m;
+        subLoadState[c.id] = 'loaded';
+        renderList();
+        if (currentClientId === c.id) renderDetail();
+      },
+      e => {
+        subLoadState[c.id] = 'error';
+        toast('Erreur abonnements (' + c.id + ') : ' + e.message, 'var(--red)');
+        renderList();
+        if (currentClientId === c.id) renderDetail();
+      }
+    );
+  });
 }
 
 // ── Navigation ───────────────────────────────────────────────────────────────
@@ -613,13 +624,16 @@ window.showView = function (view) {
 
 // ── Render liste ─────────────────────────────────────────────────────────────
 function renderList() {
-  // ── KPIs : TOUJOURS rattachés au produit sélectionné (identiques dans les deux
-  // vues), basés sur la requête filtrée existante (allSubscriptions). Inchangé.
-  const scoped = allClients.filter(c => allSubscriptions[c.id]?.[CURRENT_PRODUCT.key]);
+  // ── KPIs : TOUJOURS rattachés au produit sélectionné, calculés sur les
+  // abonnements RÉELS (lus par sous-collection). Ne comptent que les lectures
+  // réussies ('loaded') : un client encore en chargement n'est jamais compté
+  // comme sans abonnement.
+  const subFor = c => (subLoadState[c.id] === 'loaded' ? allSubsByClient[c.id]?.[CURRENT_PRODUCT.key] : null);
+  const scoped = allClients.filter(c => subFor(c));
   const actifs = scoped.filter(c => c.status === 'active');
   let mrr = 0, totalSeats = 0, devisSansTarif = 0;
-  Object.values(allSubscriptions).forEach(subs => {
-    const sub = subs[CURRENT_PRODUCT.key];
+  scoped.forEach(c => {
+    const sub = subFor(c);
     if (sub && sub.status === 'active') {
       const m = subMonthly(sub);
       if (m.kind === 'devis') devisSansTarif += 1; else mrr += (m.amount || 0);
@@ -627,6 +641,9 @@ function renderList() {
     }
   });
   const arr = mrr * 12;
+  // État de lecture global (pour ne pas confondre chargement et absence).
+  const pending = allClients.some(c => subLoadState[c.id] === 'loading' || subLoadState[c.id] === undefined);
+  const errors = allClients.filter(c => subLoadState[c.id] === 'error').length;
   document.getElementById('kpi-clients').textContent = actifs.length;
   document.getElementById('kpi-clients-sub').textContent = scoped.length + ' · ' + CURRENT_PRODUCT.name;
   document.getElementById('kpi-mrr').textContent = mrr + '€';
@@ -639,12 +656,13 @@ function renderList() {
 
   if (currentScope === 'all') {
     // ── Vue « Tous les clients » ────────────────────────────────────────────
-    // Tous les clients du registre, avec leurs produits réels (abonnements
-    // réellement présents). Les KPI ci-dessus restent ceux du produit sélectionné.
+    // Tous les clients du registre, avec leurs produits réels. Les KPI ci-dessus
+    // restent ceux du produit sélectionné.
     const actifsAll = allClients.filter(c => c.status === 'active').length;
     document.getElementById('list-title').textContent = 'Tous les clients';
     document.getElementById('list-sub').textContent =
-      allClients.length + ' client(s) · ' + actifsAll + ' actif(s) — KPI ci-dessus : ' + CURRENT_PRODUCT.name;
+      allClients.length + ' client(s) · ' + actifsAll + ' actif(s) — KPI ci-dessus : ' + CURRENT_PRODUCT.name
+      + (pending ? ' · chargement des abonnements…' : (errors ? ' · ' + errors + ' en erreur de lecture' : ''));
     if (allClients.length === 0) {
       grid.innerHTML = '<div class="empty-state"><div class="ico">🏢</div><div>Aucun client</div></div>';
       return;
@@ -652,10 +670,17 @@ function renderList() {
     const sortedClients = allClients.slice().sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
     grid.innerHTML = sortedClients.map(c => {
       const initials = (c.name || '?').split(' ').map(n => n[0] || '').join('').slice(0, 2).toUpperCase();
-      const prods = Object.keys(allSubsByClient[c.id] || {}).sort();
-      const badges = prods.length
-        ? prods.map(p => `<span class="prod-badge">${PRODUCTS[p]?.name || p}</span>`).join('')
-        : '<span class="prod-badge none">Aucun produit</span>';
+      // Jamais confondre chargement / erreur / absence réelle.
+      const st = subLoadState[c.id];
+      let badges;
+      if (st === 'error') badges = '<span class="prod-badge err">Lecture impossible</span>';
+      else if (st !== 'loaded') badges = '<span class="prod-badge load">Chargement…</span>';
+      else {
+        const prods = Object.keys(allSubsByClient[c.id] || {}).sort();
+        badges = prods.length
+          ? prods.map(p => `<span class="prod-badge">${PRODUCTS[p]?.name || p}</span>`).join('')
+          : '<span class="prod-badge none">Aucun produit</span>';
+      }
       const status = c.status || 'active';
       const statusLabel = status === 'active' ? 'actif' : (status === 'suspended' ? 'suspendu' : status);
       return `<div class="client-row-item" onclick="openClientDetail('${c.id}')">
@@ -672,16 +697,20 @@ function renderList() {
     return;
   }
 
-  // ── Vue « Clients de ce produit » (comportement existant, inchangé) ────────
+  // ── Vue « Clients de ce produit » ─────────────────────────────────────────
   document.getElementById('list-title').textContent = CURRENT_PRODUCT.name + ' — Clients';
-  document.getElementById('list-sub').textContent = actifs.length + ' client(s) actif(s) sur ' + scoped.length;
+  document.getElementById('list-sub').textContent = actifs.length + ' client(s) actif(s) sur ' + scoped.length
+    + (pending ? ' · chargement…' : '');
   if (scoped.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="ico">🏢</div><div>Aucun client ' + CURRENT_PRODUCT.name + '</div><div style="font-size:10px;">Aucun client rattaché à ce produit.</div></div>';
+    // Ne pas afficher « aucun client » tant que des lectures sont en cours.
+    grid.innerHTML = pending
+      ? '<div class="empty-state"><div class="ico">⏳</div><div>Chargement des abonnements…</div></div>'
+      : '<div class="empty-state"><div class="ico">🏢</div><div>Aucun client ' + CURRENT_PRODUCT.name + '</div><div style="font-size:10px;">Aucun client rattaché à ce produit.</div></div>';
     return;
   }
   grid.innerHTML = scoped.map(c => {
     const initials = (c.name || '?').split(' ').map(n => n[0] || '').join('').slice(0, 2).toUpperCase();
-    const sub = allSubscriptions[c.id]?.[CURRENT_PRODUCT.key];
+    const sub = allSubsByClient[c.id]?.[CURRENT_PRODUCT.key];
     const planLabel = sub ? (sub.plan + ' · ' + (sub.seatsAllocated || 0) + ' sièges') : 'Pas d\'abonnement ' + CURRENT_PRODUCT.name;
     const caLabel = sub ? subMonthlyLabel(sub) : '—';
     const status = c.status || 'active';
@@ -724,7 +753,7 @@ function renderDetail() {
   // Current product subscription — les métriques du haut restent rattachées au
   // produit sélectionné. Si le client n'y est pas abonné, on l'indique clairement
   // (jamais présenté comme abonné) et on masque « Modifier le quota ».
-  const sub = allSubscriptions[currentClientId]?.[CURRENT_PRODUCT.key];
+  const sub = allSubsByClient[currentClientId]?.[CURRENT_PRODUCT.key];
   document.getElementById('d-seats-alloc').textContent = sub ? (sub.seatsAllocated || 0) : '—';
   document.getElementById('d-seats-sub').textContent = CURRENT_PRODUCT.name;
   document.getElementById('d-plan').textContent = sub ? (sub.plan || '—') : '—';
@@ -736,12 +765,17 @@ function renderDetail() {
   document.getElementById('d-created-at').textContent = 'Depuis le ' + created;
 
   // Subscriptions table — TOUS les produits réellement abonnés par ce client
-  // (map non filtrée, clé = produit du chemin d'abonnement). Jamais de produit
-  // auquel le client n'est pas rattaché.
+  // (lecture par sous-collection, clé = produit du chemin). Jamais de produit
+  // auquel le client n'est pas rattaché. « Aucun abonnement » n'apparaît qu'après
+  // une lecture réussie (sinon chargement / erreur explicites).
+  const stDetail = subLoadState[currentClientId];
   const clientSubs = allSubsByClient[currentClientId] || {};
   const rows = Object.keys(clientSubs).sort().map(p => clientSubs[p]);
-  document.getElementById('d-sub-table-body').innerHTML = rows.length === 0
-    ? '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:20px;font-family:DM Sans,sans-serif;">Aucun abonnement</td></tr>'
+  const emptyRow = (txt, color) => `<tr><td colspan="4" style="text-align:center;color:${color};padding:20px;font-family:DM Sans,sans-serif;">${txt}</td></tr>`;
+  document.getElementById('d-sub-table-body').innerHTML =
+    stDetail === 'error' ? emptyRow('Lecture des abonnements impossible', 'var(--red)')
+    : stDetail !== 'loaded' ? emptyRow('Chargement…', 'var(--text3)')
+    : rows.length === 0 ? emptyRow('Aucun abonnement', 'var(--text3)')
     : rows.map(s => {
       const pillClass = s.status === 'active' ? 'active' : 'suspended';
       const prodName = PRODUCTS[s.product]?.name || s.product || '—';
@@ -804,7 +838,7 @@ window.updateQuotaTarif = function () {
   const t = tierForSeats(document.getElementById('mq-seats').value);
   const isDevis = t.price == null;
   const row = document.getElementById('mq-custom-row'); if (row) row.style.display = isDevis ? '' : 'none';
-  const sub = currentClientId ? allSubscriptions[currentClientId]?.[CURRENT_PRODUCT.key] : null;
+  const sub = currentClientId ? allSubsByClient[currentClientId]?.[CURRENT_PRODUCT.key] : null;
   if (sub && sub.plan === 'demo') { el.textContent = 'Démo (gratuit) — non facturé'; return; }
   const custom = document.getElementById('mq-custom-price')?.value || '';
   el.textContent = isDevis
@@ -971,7 +1005,7 @@ function buildProvisioningResult(nom, clientId, email, password, adminUid, tier,
 // ── Modifier quota ─────────────────────────────────────────────────────────
 window.openModifyQuotaModal = function () {
   if (!currentClientId) return;
-  const sub = allSubscriptions[currentClientId]?.[CURRENT_PRODUCT.key];
+  const sub = allSubsByClient[currentClientId]?.[CURRENT_PRODUCT.key];
   document.getElementById('mq-seats').value = sub?.seatsAllocated || 5;
   const cp = document.getElementById('mq-custom-price');
   if (cp) cp.value = (sub && sub.customMonthlyPrice != null) ? sub.customMonthlyPrice : '';
@@ -984,7 +1018,7 @@ window.closeModifyQuotaModal = function () {
 
 window.saveQuota = async function () {
   if (!currentClientId) return;
-  const sub = allSubscriptions[currentClientId]?.[CURRENT_PRODUCT.key];
+  const sub = allSubsByClient[currentClientId]?.[CURRENT_PRODUCT.key];
   const seatsAllocated = parseInt(document.getElementById('mq-seats').value, 10);
   if (!seatsAllocated || seatsAllocated < 1) { toast('Nombre de sièges invalide', 'var(--red)'); return; }
   const tierObj = tierForSeats(seatsAllocated);
